@@ -61,48 +61,7 @@ Route::middleware(['auth', 'verified', PreventBackHistoryCache::class, EncryptHi
 
 });
 
-Route::get('/crear-admin-temp', function () {
-    try {
-        // 1. Crear los tipos si no existen
-        \App\Models\TipoUsuario::firstOrCreate(['tipo_usuario' => 1], ['descripcion_tipo' => 'Biblioteca']);
-        \App\Models\TipoUsuario::firstOrCreate(['tipo_usuario' => 2], ['descripcion_tipo' => 'Eventos Academicos']);
-        \App\Models\TipoUsuario::firstOrCreate(['tipo_usuario' => 3], ['descripcion_tipo' => 'Graduacion']);
 
-        // 2. Borrar usuarios viejos
-        \App\Models\User::whereIn('email', ['eckosmg95@gmail.com','eventos@campuspass.test','graduacion@campuspass.test'])->delete();
-
-        // 3. Crear usuarios CON tipo y activo
-        \App\Models\User::create([
-            'name' => 'Biblioteca',
-            'email' => 'eckosmg95@gmail.com',
-            'password' => '98dabe6bc69da3fee0',
-            'tipo' => 1,
-            'activo' => true,
-            'username' => 'biblioteca',
-        ]);
-        \App\Models\User::create([
-            'name' => 'Eventos',
-            'email' => 'eventos@campuspass.test',
-            'password' => 'password',
-            'tipo' => 2,
-            'activo' => true,
-            'username' => 'eventos',
-        ]);
-        \App\Models\User::create([
-            'name' => 'Graduacion',
-            'email' => 'graduacion@campuspass.test',
-            'password' => 'password',
-            'tipo' => 3,
-            'activo' => true,
-            'username' => 'graduacion',
-        ]);
-
-        return 'OK - Tipos: ' . json_encode(\App\Models\TipoUsuario::all()) . ' - Users: ' . \App\Models\User::count();
-
-    } catch (\Exception $e) {
-        return 'ERROR: ' . $e->getMessage();
-    }
-});
 
 require __DIR__.'/public.php';
 require __DIR__.'/settings.php';
