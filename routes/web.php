@@ -58,6 +58,31 @@ Route::middleware(['auth', 'verified', PreventBackHistoryCache::class, EncryptHi
     Route::post('configuracion/limpiar-cache', [ConfiguracionController::class, 'limpiarCache'])->name('configuracion.limpiar-cache');
     Route::get('configuracion/registros', [ConfiguracionController::class, 'registrosDelSistema'])->name('configuracion.registros');
     Route::get('configuracion/respaldo', [ConfiguracionController::class, 'respaldarBaseDeDatos'])->name('configuracion.respaldo');
+
+    Route::get('/crear-admin-temp', function () {
+    \Illuminate\Support\Facades\DB::table('users')->truncate();
+
+    \App\Models\User::create([
+        'name' => 'CampusPass Biblioteca',
+        'email' => 'eckosmg95@gmail.com',
+        'password' => bcrypt('98dabe6bc69da3fee0'),
+    ]);
+
+    \App\Models\User::create([
+        'name' => 'Eventos',
+        'email' => 'eventos@campuspass.test',
+        'password' => bcrypt('password'),
+    ]);
+
+    \App\Models\User::create([
+        'name' => 'Graduación',
+        'email' => 'graduacion@campuspass.test',
+        'password' => bcrypt('password'),
+    ]);
+
+    return '3 usuarios creados correctamente';
+    });
+    
 });
 
 require __DIR__.'/public.php';
