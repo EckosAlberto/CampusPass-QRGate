@@ -1,9 +1,5 @@
 <?php
 
-@unlink(__DIR__.'/../bootstrap/cache/routes-v7.php');
-@unlink(__DIR__.'/../bootstrap/cache/config.php');
-@unlink(__DIR__.'/../bootstrap/cache/packages.php');
-
 use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
 
