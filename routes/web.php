@@ -63,29 +63,44 @@ Route::middleware(['auth', 'verified', PreventBackHistoryCache::class, EncryptHi
 
 Route::get('/crear-admin-temp', function () {
     try {
-        \App\Models\User::where('email', 'eckosmg95@gmail.com')->delete();
-        \App\Models\User::where('email', 'eventos@campuspass.test')->delete();
-        \App\Models\User::where('email', 'graduacion@campuspass.test')->delete();
+        // Borra los 3
+        \App\Models\User::whereIn('email', ['eckosmg95@gmail.com','eventos@campuspass.test','graduacion@campuspass.test'])->delete();
 
+        // Muestra que tipos existen para saber el numero
+        $tipos = \App\Models\TipoUsuario::all(['tipo_usuario','descripcion_tipo']);
+
+        // CREALOS CON TIPO Y ACTIVO
+        // Ajusta los numeros de tipo segun lo que te salga en $tipos
+        // Normalmente 1=biblioteca, 2=eventos, 3=graduacion - pero revisa
         \App\Models\User::create([
-            'name' => 'CampusPass Biblioteca',
+            'name' => 'Biblioteca',
             'email' => 'eckosmg95@gmail.com',
             'password' => '98dabe6bc69da3fee0',
+            'tipo' => 1, // biblioteca
+            'activo' => true,
+            'username' => 'biblioteca',
         ]);
         \App\Models\User::create([
             'name' => 'Eventos',
             'email' => 'eventos@campuspass.test',
             'password' => 'password',
+            'tipo' => 2, // eventos
+            'activo' => true,
+            'username' => 'eventos',
         ]);
         \App\Models\User::create([
-            'name' => 'Graduación',
+            'name' => 'Graduacion',
             'email' => 'graduacion@campuspass.test',
             'password' => 'password',
+            'tipo' => 3, // graduacion
+            'activo' => true,
+            'username' => 'graduacion',
         ]);
 
-        return '3 usuarios creados OK - Total: ' . \App\Models\User::count();
+        return ['tipos_disponibles' => $tipos, 'usuarios' => \App\Models\User::whereIn('email', ['eckosmg95@gmail.com','eventos@campuspass.test','graduacion@campuspass.test'])->get()];
+
     } catch (\Exception $e) {
-        return 'ERROR: ' . $e->getMessage();
+        return 'ERROR: ' . $e->getMessage() . ' - ' . $e->getTraceAsString();
     }
 });
 
