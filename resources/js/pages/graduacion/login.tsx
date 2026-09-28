@@ -33,12 +33,12 @@ export default function Login() {
                                 <User className="pointer-events-none absolute inset-y-0 left-3 my-auto size-4 text-amber-500" />
                                 <Input
                                     id="email"
-                                    type="email"
+                                    type="text"
                                     name="email"
                                     required
                                     autoFocus
                                     tabIndex={1}
-                                    autoComplete="email"
+                                    autoComplete="username"
                                     placeholder="Ingresa tu usuario"
                                     className="bg-neutral-100 pl-10 dark:bg-neutral-900"
                                 />
