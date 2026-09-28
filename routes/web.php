@@ -59,15 +59,28 @@ Route::middleware(['auth', 'verified', PreventBackHistoryCache::class, EncryptHi
     Route::get('configuracion/registros', [ConfiguracionController::class, 'registrosDelSistema'])->name('configuracion.registros');
     Route::get('configuracion/respaldo', [ConfiguracionController::class, 'respaldarBaseDeDatos'])->name('configuracion.respaldo');
 
-    Route::get('/crear-admin-temp', function () {
-    $users = \App\Models\User::all()->map(fn($u) => $u->email . ' - ' . $u->id);
-    return response()->json([
-        'total_usuarios_en_railway' => \App\Models\User::count(),
-        'emails' => $users,
-        'puede_logear_eventos' => \Illuminate\Support\Facades\Hash::check('password', \App\Models\User::where('email','eventos@campuspass.test')->first()->password ?? 'nada'),
-    ]);
 });
 
+ // <- esta es la que cierra el grupo de auth
+
+Route::get('/crear-admin-temp', function () {
+    \Illuminate\Support\Facades\DB::table('users')->truncate();
+    \App\Models\User::create([
+        'name' => 'CampusPass Biblioteca',
+        'email' => 'eckosmg95@gmail.com',
+        'password' => '98dabe6bc69da3fee0',
+    ]);
+    \App\Models\User::create([
+        'name' => 'Eventos',
+        'email' => 'eventos@campuspass.test',
+        'password' => 'password',
+    ]);
+    \App\Models\User::create([
+        'name' => 'Graduación',
+        'email' => 'graduacion@campuspass.test',
+        'password' => 'password',
+    ]);
+    return '3 usuarios creados';
 });
 
 require __DIR__.'/public.php';
