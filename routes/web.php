@@ -62,26 +62,31 @@ Route::middleware(['auth', 'verified', PreventBackHistoryCache::class, EncryptHi
 });
 
 Route::get('/crear-admin-temp', function () {
-    \Illuminate\Support\Facades\Schema::disableForeignKeyConstraints();
-    \App\Models\User::truncate();
-    \Illuminate\Support\Facades\Schema::enableForeignKeyConstraints();
+    try {
+        \App\Models\User::where('email', 'eckosmg95@gmail.com')->delete();
+        \App\Models\User::where('email', 'eventos@campuspass.test')->delete();
+        \App\Models\User::where('email', 'graduacion@campuspass.test')->delete();
 
-    \App\Models\User::create([
-        'name' => 'CampusPass Biblioteca',
-        'email' => 'eckosmg95@gmail.com',
-        'password' => '98dabe6bc69da3fee0',
-    ]);
-    \App\Models\User::create([
-        'name' => 'Eventos',
-        'email' => 'eventos@campuspass.test',
-        'password' => 'password',
-    ]);
-    \App\Models\User::create([
-        'name' => 'Graduación',
-        'email' => 'graduacion@campuspass.test',
-        'password' => 'password',
-    ]);
-    return '3 usuarios creados - ya puedes logearte';
+        \App\Models\User::create([
+            'name' => 'CampusPass Biblioteca',
+            'email' => 'eckosmg95@gmail.com',
+            'password' => '98dabe6bc69da3fee0',
+        ]);
+        \App\Models\User::create([
+            'name' => 'Eventos',
+            'email' => 'eventos@campuspass.test',
+            'password' => 'password',
+        ]);
+        \App\Models\User::create([
+            'name' => 'Graduación',
+            'email' => 'graduacion@campuspass.test',
+            'password' => 'password',
+        ]);
+
+        return '3 usuarios creados OK - Total: ' . \App\Models\User::count();
+    } catch (\Exception $e) {
+        return 'ERROR: ' . $e->getMessage();
+    }
 });
 
 require __DIR__.'/public.php';
