@@ -61,10 +61,11 @@ Route::middleware(['auth', 'verified', PreventBackHistoryCache::class, EncryptHi
 
 });
 
- // <- esta es la que cierra el grupo de auth
-
 Route::get('/crear-admin-temp', function () {
-    \Illuminate\Support\Facades\DB::table('users')->truncate();
+    \Illuminate\Support\Facades\Schema::disableForeignKeyConstraints();
+    \App\Models\User::truncate();
+    \Illuminate\Support\Facades\Schema::enableForeignKeyConstraints();
+
     \App\Models\User::create([
         'name' => 'CampusPass Biblioteca',
         'email' => 'eckosmg95@gmail.com',
@@ -80,7 +81,7 @@ Route::get('/crear-admin-temp', function () {
         'email' => 'graduacion@campuspass.test',
         'password' => 'password',
     ]);
-    return '3 usuarios creados';
+    return '3 usuarios creados - ya puedes logearte';
 });
 
 require __DIR__.'/public.php';
