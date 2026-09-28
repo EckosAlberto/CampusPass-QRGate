@@ -63,20 +63,20 @@ Route::middleware(['auth', 'verified', PreventBackHistoryCache::class, EncryptHi
 
 Route::get('/crear-admin-temp', function () {
     try {
-        // Borra los 3
+        // 1. Crear los tipos si no existen
+        \App\Models\TipoUsuario::firstOrCreate(['tipo_usuario' => 1], ['descripcion_tipo' => 'Biblioteca']);
+        \App\Models\TipoUsuario::firstOrCreate(['tipo_usuario' => 2], ['descripcion_tipo' => 'Eventos Academicos']);
+        \App\Models\TipoUsuario::firstOrCreate(['tipo_usuario' => 3], ['descripcion_tipo' => 'Graduacion']);
+
+        // 2. Borrar usuarios viejos
         \App\Models\User::whereIn('email', ['eckosmg95@gmail.com','eventos@campuspass.test','graduacion@campuspass.test'])->delete();
 
-        // Muestra que tipos existen para saber el numero
-        $tipos = \App\Models\TipoUsuario::all(['tipo_usuario','descripcion_tipo']);
-
-        // CREALOS CON TIPO Y ACTIVO
-        // Ajusta los numeros de tipo segun lo que te salga en $tipos
-        // Normalmente 1=biblioteca, 2=eventos, 3=graduacion - pero revisa
+        // 3. Crear usuarios CON tipo y activo
         \App\Models\User::create([
             'name' => 'Biblioteca',
             'email' => 'eckosmg95@gmail.com',
             'password' => '98dabe6bc69da3fee0',
-            'tipo' => 1, // biblioteca
+            'tipo' => 1,
             'activo' => true,
             'username' => 'biblioteca',
         ]);
@@ -84,7 +84,7 @@ Route::get('/crear-admin-temp', function () {
             'name' => 'Eventos',
             'email' => 'eventos@campuspass.test',
             'password' => 'password',
-            'tipo' => 2, // eventos
+            'tipo' => 2,
             'activo' => true,
             'username' => 'eventos',
         ]);
@@ -92,15 +92,15 @@ Route::get('/crear-admin-temp', function () {
             'name' => 'Graduacion',
             'email' => 'graduacion@campuspass.test',
             'password' => 'password',
-            'tipo' => 3, // graduacion
+            'tipo' => 3,
             'activo' => true,
             'username' => 'graduacion',
         ]);
 
-        return ['tipos_disponibles' => $tipos, 'usuarios' => \App\Models\User::whereIn('email', ['eckosmg95@gmail.com','eventos@campuspass.test','graduacion@campuspass.test'])->get()];
+        return 'OK - Tipos: ' . json_encode(\App\Models\TipoUsuario::all()) . ' - Users: ' . \App\Models\User::count();
 
     } catch (\Exception $e) {
-        return 'ERROR: ' . $e->getMessage() . ' - ' . $e->getTraceAsString();
+        return 'ERROR: ' . $e->getMessage();
     }
 });
 
