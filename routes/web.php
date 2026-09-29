@@ -12,17 +12,6 @@ use App\Http\Middleware\PreventBackHistoryCache;
 use Illuminate\Support\Facades\Route;
 use Inertia\EncryptHistoryMiddleware;
 
-Route::get('/crear-admin-temp', function () {
-    \App\Models\TipoUsuario::firstOrCreate(['tipo_usuario' => 1], ['descripcion_tipo' => 'Biblioteca']);
-    \App\Models\TipoUsuario::firstOrCreate(['tipo_usuario' => 2], ['descripcion_tipo' => 'Eventos']);
-    \App\Models\TipoUsuario::firstOrCreate(['tipo_usuario' => 3], ['descripcion_tipo' => 'Graduacion']);
-    \App\Models\User::whereIn('email', ['eckosmg95@gmail.com','eventos@campuspass.test','graduacion@campuspass.test'])->delete();
-    \App\Models\User::create(['name'=>'Biblio','email'=>'eckosmg95@gmail.com','username'=>'biblioteca','password'=>'98dabe6bc69da3fee0','tipo'=>1,'activo'=>1]);
-    \App\Models\User::create(['name'=>'Eventos','email'=>'eventos@campuspass.test','username'=>'eventos','password'=>'password','tipo'=>2,'activo'=>1]);
-    \App\Models\User::create(['name'=>'Grad','email'=>'graduacion@campuspass.test','username'=>'graduacion','password'=>'password','tipo'=>3,'activo'=>1]);
-    return 'Usuarios creados OK';
-});
-
 // Rutas públicas: no requieren autenticación (fuera del grupo 'auth').
 Route::inertia('/', 'portal')->name('home');
 
