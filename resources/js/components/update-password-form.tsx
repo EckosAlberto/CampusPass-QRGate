@@ -7,13 +7,11 @@ import { Label } from '@/components/ui/label';
 import type { RouteFormDefinition } from '@/wayfinder';
 
 type Props = {
-    // Los formularios HTML no soportan PUT nativo: Wayfinder genera el
-    // helper .form() de una ruta PUT como un POST con _method spoofing.
+    
     updateForm: () => RouteFormDefinition<'post'>;
 };
 
-// Formulario de cambio de contraseña, compartido por Biblioteca, Eventos
-// Académicos y Graduación: cada guard le pasa su propia ruta de actualización.
+
 export default function UpdatePasswordForm({ updateForm }: Props) {
     const passwordInput = useRef<HTMLInputElement>(null);
     const currentPasswordInput = useRef<HTMLInputElement>(null);

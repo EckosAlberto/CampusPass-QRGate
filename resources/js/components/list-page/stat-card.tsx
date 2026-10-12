@@ -35,10 +35,6 @@ export type StatCardItem = {
     color?: StatCardColor;
 };
 
-/**
- * Card de total individual (ej. "Hombres 389") con borde e icono de color,
- * usada en la fila de "cards de totales" de las pantallas de listado.
- */
 export function StatCard({
     label,
     value,
@@ -66,9 +62,7 @@ export function StatCard({
     );
 }
 
-/**
- * Fila de cards de totales para pantallas de listado.
- */
+
 export function StatCardsRow({
     items,
     className,

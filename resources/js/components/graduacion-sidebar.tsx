@@ -80,10 +80,6 @@ const graduacionNavItems: NavItem[] = [
     },
 ];
 
-// Sidebar propio del guard `graduacion` (equipo de Graduación), separado del
-// AppSidebar de Biblioteca: usuarios, guard y logout distintos. El
-// usuario/logout vive en GraduacionSidebarHeader (menú arriba a la
-// derecha), no aquí.
 export function GraduacionSidebar() {
     return (
         <Sidebar collapsible="icon" variant="inset">

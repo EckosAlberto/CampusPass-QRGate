@@ -23,10 +23,6 @@ type Props = {
     logoutHref: RouteDefinition<'post'>;
 };
 
-// Menú de usuario mostrado en el header (esquina superior derecha). Recibe
-// el usuario y las rutas de configuración/logout como props para servir a
-// los tres guards (Biblioteca, Eventos, Graduación), cada uno con sus
-// propias rutas.
 export function UserMenu({
     user,
     settingsHref,

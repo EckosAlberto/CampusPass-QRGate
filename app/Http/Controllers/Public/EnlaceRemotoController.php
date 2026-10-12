@@ -12,22 +12,26 @@ use Inertia\Response;
 
 class EnlaceRemotoController extends Controller
 {
+    // Número de registros de acceso a mostrar por página en la vista de enlace remoto.
     private const POR_PAGINA = 20;
 
+    // Muestra la vista de enlace remoto para la ceremonia de graduación, incluyendo los registros de acceso y la información de la ceremonia.
     public function show(Request $request, CeremoniaGraduacion $ceremonia): Response
     {
+        // Valida que el enlace sea válido y que la ceremonia esté vigente.
         if (! $request->hasValidSignature()) {
             return Inertia::render('graduacion/enlace-no-disponible', [
                 'mensaje' => 'Este enlace ya no está disponible.',
             ]);
         }
 
+        // Verifica si la ceremonia ya finalizó y muestra un mensaje si es así.
         if (now()->greaterThan($ceremonia->fecha_fin)) {
             return Inertia::render('graduacion/enlace-no-disponible', [
                 'mensaje' => 'Esta ceremonia ya finalizó.',
             ]);
         }
-
+        // Obtiene los registros de acceso a la ceremonia, incluyendo la información del boleto y del alumno, y los ordena por fecha y hora de manera descendente.
         $accesos = RegistroAccesoGraduacion::query()
             ->whereHas('boleto', fn ($q) => $q->where('fk_id_ceremonia', $ceremonia->id))
             ->with('boleto.alumno')
@@ -35,6 +39,7 @@ class EnlaceRemotoController extends Controller
             ->paginate(self::POR_PAGINA)
             ->withQueryString();
 
+        // Renderiza la vista de enlace remoto con la información de la ceremonia, el número de egresados e invitados registrados, el total de accesos y los registros de acceso paginados.
         return Inertia::render('graduacion/enlace-remoto', [
             'ceremonia' => [
                 'nombre' => $ceremonia->nombre,

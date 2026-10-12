@@ -13,8 +13,7 @@ import { Spinner } from '@/components/ui/spinner';
 import { OTP_MAX_LENGTH } from '@/hooks/use-two-factor-auth';
 import { store } from '@/routes/eventos/two-factor/login';
 
-// Challenge de 2FA del guard de Eventos Académicos, posterior a validar
-// correo/contraseña en eventos/login.tsx (ver Eventos\LoginController).
+
 export default function TwoFactorChallenge() {
     const [showRecoveryInput, setShowRecoveryInput] = useState<boolean>(false);
     const [code, setCode] = useState<string>('');

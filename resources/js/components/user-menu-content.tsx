@@ -19,9 +19,7 @@ type UsuarioBasico = {
 
 type Props = {
     user: UsuarioBasico;
-    // Rutas del guard correspondiente — Biblioteca usa /settings/profile,
-    // Eventos/Graduación no tienen esa pantalla y usan su propia página de
-    // Seguridad (2FA) en su lugar.
+    
     settingsHref: RouteDefinition<'get'>;
     settingsLabel: string;
     logoutHref: RouteDefinition<'post'>;

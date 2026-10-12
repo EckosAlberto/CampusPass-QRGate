@@ -117,12 +117,12 @@ function guardarAjustes(
     });
 }
 
+// Función para mostrar un mensaje de "próximamente" en un toast
 function proximamente(accion: string) {
-    toast.info(`${accion} estará disponible próximamente.`);
+    toast.info(`${accion} .`);
 }
 
-// El backend usa snake_case; el front usa camelCase. Este tipo/función
-// evitan tener que repetir el mapeo en cada fieldset.
+
 type AjustesToPayload = AjustesBiblioteca;
 
 function mapearAjustes(valores: Partial<AjustesToPayload>) {
@@ -1039,9 +1039,7 @@ function NuevoUsuarioDialog({
     );
 }
 
-// Diálogo para editar un usuario existente: mismos campos que "Nuevo
-// usuario" sin contraseña (esa se cambia desde la cuenta del propio
-// usuario, en Seguridad).
+
 function EditarUsuarioDialog({
     usuario,
     onOpenChange,
@@ -1064,9 +1062,7 @@ function EditarUsuarioDialog({
     );
 }
 
-// Se remonta con key={usuario.id} en vez de sincronizar el prop vía
-// useEffect: así cada usuario abre con su propio estado inicial sin violar
-// la regla react-hooks/set-state-in-effect.
+
 function EditarUsuarioFormulario({
     usuario,
     onGuardado,

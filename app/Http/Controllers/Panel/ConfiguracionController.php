@@ -53,9 +53,6 @@ class ConfiguracionController extends Controller
                 ->map(fn (HorarioBiblioteca $h) => [
                     'dia' => $h->dia,
                     'abierto' => $h->abierto,
-                    // La columna es TIME (MySQL la devuelve como "H:i:s"):
-                    // se recorta a "H:i" para que coincida con el value del
-                    // <input type="time"> y con la validación al guardar.
                     'apertura' => substr((string) $h->apertura, 0, 5),
                     'cierre' => substr((string) $h->cierre, 0, 5),
                 ])->all(),

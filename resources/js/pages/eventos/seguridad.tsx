@@ -23,9 +23,6 @@ type Props = {
     requiresConfirmation?: boolean;
 };
 
-// Pantalla de Seguridad del equipo de Eventos Académicos: cambio de
-// contraseña y gestión de 2FA, mismo bloque que settings/security.tsx
-// (Biblioteca) pero con las rutas propias del guard 'eventos'.
 export default function Seguridad({
     twoFactorEnabled = false,
     requiresConfirmation = false,

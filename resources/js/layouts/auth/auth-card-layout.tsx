@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/card';
 import { home } from '@/routes';
 
+// Layout para tarjetas de autenticación.
 export default function AuthCardLayout({
     children,
     title,

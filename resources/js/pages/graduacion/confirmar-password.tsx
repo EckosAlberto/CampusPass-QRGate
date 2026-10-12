@@ -6,8 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
 import { store } from '@/routes/graduacion/password/confirm';
 
-// Confirma la contraseña antes de gestionar 2FA (guard de Graduación),
-// igual que auth/confirm-password.tsx para Biblioteca.
+// Confirma la contraseña antes de gestionar 2FA (guard de Graduación)
 export default function ConfirmarPassword() {
     return (
         <>

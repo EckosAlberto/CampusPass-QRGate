@@ -8,8 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
 import { store } from '@/routes/eventos/login';
 
-// Página de inicio de sesión del equipo de Eventos Académicos, separada
-// por completo del login de Biblioteca (guard y tabla de usuarios propios).
+// Página de inicio de sesión del equipo de Eventos Académicos.
 export default function Login() {
     return (
         <>
@@ -33,13 +32,13 @@ export default function Login() {
                                 <User className="pointer-events-none absolute inset-y-0 left-3 my-auto size-4 text-amber-500" />
                                 <Input
                                     id="email"
-                                    type="text"
+                                    type="email"
                                     name="email"
                                     required
                                     autoFocus
                                     tabIndex={1}
                                     autoComplete="email"
-                                    placeholder="eventos"
+                                    placeholder="Ingresa tu usuario"
                                     className="bg-neutral-100 pl-10 dark:bg-neutral-900"
                                 />
                             </div>

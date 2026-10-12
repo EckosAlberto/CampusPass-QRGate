@@ -67,10 +67,6 @@ const eventosNavItems: NavItem[] = [
     },
 ];
 
-// Sidebar propio del guard `eventos` (equipo de Eventos Académicos), separado
-// del AppSidebar de Biblioteca: usuarios, guard y logout distintos. El
-// usuario/logout vive en EventosSidebarHeader (menú arriba a la derecha),
-// no aquí.
 export function EventosSidebar() {
     return (
         <Sidebar collapsible="icon" variant="inset">

@@ -69,6 +69,9 @@ test('users can logout', function () {
     $response->assertRedirect(route('home'));
 });
 
+/**
+ * 
+ */
 test('users are rate limited', function () {
     $user = User::factory()->create();
 

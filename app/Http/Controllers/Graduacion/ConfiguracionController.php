@@ -94,9 +94,17 @@ class ConfiguracionController extends Controller
         $datos = $this->normalizarDatosPersonales($datos);
 
         if (array_key_exists('rol', $datos)) {
-            $datos['rol_id'] = RolGraduacion::porNombre($datos['rol'])->id;
+            $rol = RolGraduacion::porNombre($datos['rol']);
+
+            if (! $rol) {
+                throw ValidationException::withMessages([
+                    'rol' => "El rol '{$datos['rol']}' no existe en la base de datos.",
+                ]);
+            }
+
+            $datos['rol_id'] = $rol->id;
             unset($datos['rol']);
-        }
+    }
 
         
         if (array_key_exists('name', $datos) || array_key_exists('apellido_paterno', $datos) || array_key_exists('apellido_materno', $datos)) {

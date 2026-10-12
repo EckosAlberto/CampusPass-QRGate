@@ -11,10 +11,6 @@ type FilterSummaryProps = {
     className?: string;
 };
 
-/**
- * Etiquetas que muestran el contexto de lo que se está viendo, derivado de
- * los filtros aplicados (ej. "Periodo: AGO-DIC/2025").
- */
 export function FilterSummary({ items, className }: FilterSummaryProps) {
     if (items.length === 0) {
         return null;

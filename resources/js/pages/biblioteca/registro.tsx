@@ -14,20 +14,11 @@ import { store } from '@/routes/biblioteca';
 // Tiempo en milisegundos que se muestra el resultado antes de volver al formulario
 const AUTO_RETORNO_MS = 4000;
 
-// Se leen ambos formatos: las credenciales de alumno traen un código de
-// barras Code128 (su QR apunta a un portal externo que no podemos
-// resolver), y las de personal solo traen QR — a veces con el RFC solo, a
-// veces como texto de varias líneas ("Nombre: ...\nRFC: ...\nCURP: ...").
 const FORMATOS_ESCANER = [BarcodeFormat.CODE_128, BarcodeFormat.QR_CODE];
 const FORMATO_CODIGO_VALIDO = /^[A-Za-z0-9]{1,13}$/;
 const ETIQUETA_RFC = /rfc[:\s]+([A-Za-z0-9]{1,13})/i;
 
-// Extrae un identificador utilizable de lo que decodificó la cámara: un
-// código plano (número de control o RFC solos, como el barcode de alumno),
-// o el valor de una línea "RFC: ..." dentro de un texto más largo. Si no
-// encuentra ninguno (como la URL del QR inútil de las credenciales de
-// alumno), devuelve null para que la cámara lo ignore en silencio y siga
-// buscando, en vez de mostrar un error cada vez que ese QR queda a la vista.
+
 function extraerIdentificador(textoDecodificado: string): string | null {
     const texto = textoDecodificado.trim();
 
@@ -136,10 +127,7 @@ function ResultadoOverlay({ resultado }: { resultado: Resultado }) {
     );
 }
 
-// Componente para escanear credenciales con la cámara, con captura manual de
-// respaldo por si la cámara no está disponible o el permiso es denegado. El
-// resultado del último escaneo se superpone dentro del cuadro de la cámara
-// (en vez de reemplazar toda la pantalla) durante AUTO_RETORNO_MS.
+
 function EscanerForm({
     resultadoDelServidor,
 }: {

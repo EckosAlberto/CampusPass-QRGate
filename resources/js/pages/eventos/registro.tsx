@@ -23,15 +23,12 @@ import type { RegistroEventoProps, Resultado } from '@/types';
 // Tiempo en milisegundos que se muestra el resultado antes de volver al formulario
 const AUTO_RETORNO_MS = 4000;
 
-// Tiempo en milisegundos que se muestra la confirmación de "guardado sin
-// conexión" antes de volver a activar la cámara.
+
 const CONFIRMACION_OFFLINE_MS = 3000;
 
 const COMPONENTE_REGISTRO = 'eventos/registro';
 
-// Las credenciales físicas del Tec solo traen un código de barras Code128
-// legible con el número de control: su QR apunta a un portal externo del
-// plantel (emergencias.tepic.tecnm.mx) que no podemos resolver.
+
 const FORMATOS_ESCANER = [BarcodeFormat.CODE_128];
 
 function iniciales(nombre: string) {
@@ -100,13 +97,7 @@ function ResultadoOverlay({ resultado }: { resultado: Resultado }) {
     );
 }
 
-// Escanea credenciales con la cámara y envía cada escaneo a la URL firmada
-// actual (no hay ruta Wayfinder posible: el path incluye una firma dinámica).
-// Si no hay conexión, el escaneo se guarda localmente (IndexedDB) y se
-// sincroniza solo en cuanto vuelve la red, para que el control de acceso no
-// se detenga ante una falla de internet. El resultado del último escaneo se
-// superpone dentro del cuadro de la cámara (en vez de reemplazar toda la
-// pantalla) durante AUTO_RETORNO_MS.
+
 function EscanerForm({
     nombreEvento,
     tipo,

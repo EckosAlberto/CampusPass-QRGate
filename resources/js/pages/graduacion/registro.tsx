@@ -27,8 +27,6 @@ const CONFIRMACION_OFFLINE_MS = 3000;
 
 const COMPONENTE_REGISTRO = 'graduacion/registro';
 
-// Los boletos de graduación son un QR propio de CampusPass, no una
-// credencial física del Tec — aquí sí basta con leer QR.
 const FORMATOS_ESCANER = [BarcodeFormat.QR_CODE];
 
 function iniciales(nombre: string) {
@@ -93,13 +91,6 @@ function ResultadoOverlay({ resultado }: { resultado: ResultadoGraduacion }) {
     );
 }
 
-// Escanea credenciales con la cámara y envía cada escaneo a la URL firmada
-// actual (no hay ruta Wayfinder posible: el path incluye una firma dinámica).
-// Si no hay conexión, el escaneo se guarda localmente (IndexedDB) y se
-// sincroniza solo en cuanto vuelve la red, para que el control de acceso no
-// se detenga ante una falla de internet. El resultado del último escaneo se
-// superpone dentro del cuadro de la cámara (en vez de reemplazar toda la
-// pantalla) durante AUTO_RETORNO_MS.
 function EscanerForm({
     nombreCeremonia,
     urlActual,

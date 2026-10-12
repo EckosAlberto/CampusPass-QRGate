@@ -4,6 +4,7 @@ import { EventosSidebar } from '@/components/eventos-sidebar';
 import { EventosSidebarHeader } from '@/components/eventos-sidebar-header';
 import type { AppLayoutProps } from '@/types';
 
+// Layout para la vista de eventos con barra lateral.
 export default function EventosSidebarLayout({
     children,
     breadcrumbs = [],

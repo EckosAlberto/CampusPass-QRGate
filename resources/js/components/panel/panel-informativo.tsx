@@ -1,7 +1,7 @@
 import type { LucideIcon } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 
-export function ProximamentePanel({
+export function PanelInformativo({
     titulo,
     icon: Icon,
 }: {

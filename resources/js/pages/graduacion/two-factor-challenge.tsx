@@ -13,8 +13,7 @@ import { Spinner } from '@/components/ui/spinner';
 import { OTP_MAX_LENGTH } from '@/hooks/use-two-factor-auth';
 import { store } from '@/routes/graduacion/two-factor/login';
 
-// Challenge de 2FA del guard de Graduación, posterior a validar
-// correo/contraseña en graduacion/login.tsx (ver Graduacion\LoginController).
+// Página de desafío de autenticación en dos pasos (2FA) para el equipo de Graduación.
 export default function TwoFactorChallenge() {
     const [showRecoveryInput, setShowRecoveryInput] = useState<boolean>(false);
     const [code, setCode] = useState<string>('');

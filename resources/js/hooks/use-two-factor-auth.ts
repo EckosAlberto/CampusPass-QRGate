@@ -2,9 +2,6 @@ import { useHttp } from '@inertiajs/react';
 import { useCallback, useState } from 'react';
 import type { RouteDefinition, RouteQueryOptions } from '@/wayfinder';
 
-// Rutas de gestión de 2FA que necesita el hook. Se reciben como parámetro
-// (en vez de importarlas fijo de `@/routes/two-factor`) para poder
-// reutilizar la misma lógica con las rutas propias de Eventos/Graduación.
 export type TwoFactorAuthRoutes = {
     qrCode: (options?: RouteQueryOptions) => RouteDefinition<'get'>;
     secretKey: (options?: RouteQueryOptions) => RouteDefinition<'get'>;

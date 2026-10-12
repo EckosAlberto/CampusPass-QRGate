@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
 import { store } from '@/routes/password/confirm';
 
-// Página de confirmación de contraseña
+// Página de confirmación de contraseña (biblioteca).
 export default function ConfirmPassword() {
     return (
         <>

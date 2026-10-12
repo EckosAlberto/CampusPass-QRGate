@@ -1,9 +1,7 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useInitials } from '@/hooks/use-initials';
 
-// Forma mínima que necesita este componente — así sirve tanto para el
-// `User` de Biblioteca como para `EventosUsuario`/`GraduacionUsuario`, que
-// no comparten todos los campos de `User` (email_verified_at, etc.).
+
 type UsuarioBasico = {
     name: string;
     email: string;

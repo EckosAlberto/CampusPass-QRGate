@@ -5,10 +5,7 @@ import { cn } from '@/lib/utils';
 
 type CreateButtonProps = Omit<ComponentProps<typeof Button>, 'variant'>;
 
-/**
- * Botón de "crear" para pantallas de listado. Siempre naranja, según el
- * estándar de diseño de pantallas de tabla/listado.
- */
+// Botón de "crear" para pantallas de listado. Siempre naranja.
 export function CreateButton({
     children,
     className,

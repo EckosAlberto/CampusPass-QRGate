@@ -196,7 +196,7 @@ export default function Incidencias({
         );
 
         return () => clearTimeout(temporizador);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+        
     }, [busqueda]);
 
     function navegar(

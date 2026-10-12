@@ -21,16 +21,12 @@ type NotificacionItem = {
 };
 
 type Props = {
-    // Rutas del guard correspondiente — cada módulo (Biblioteca/Eventos/
-    // Graduación) tiene su propio endpoint, ya que las incidencias de cada
-    // uno se consultan por separado.
+    
     indexRoute: () => RouteDefinition<'get'>;
     marcarVistasRoute: () => RouteDefinition<'post'>;
 };
 
-// Campana de notificaciones con las incidencias de acceso recientes del
-// módulo (código inválido, no registrado, etc.). Al abrirse, marca las
-// pendientes como vistas.
+
 export function NotificationBell({ indexRoute, marcarVistasRoute }: Props) {
     const { submit } = useHttp();
     const [items, setItems] = useState<NotificacionItem[]>([]);

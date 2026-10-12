@@ -4,6 +4,7 @@ import { GraduacionSidebar } from '@/components/graduacion-sidebar';
 import { GraduacionSidebarHeader } from '@/components/graduacion-sidebar-header';
 import type { AppLayoutProps } from '@/types';
 
+// Layout para la vista de graduación con barra lateral.
 export default function GraduacionSidebarLayout({
     children,
     breadcrumbs = [],

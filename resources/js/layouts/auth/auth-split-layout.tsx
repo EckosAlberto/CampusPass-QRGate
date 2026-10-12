@@ -3,6 +3,7 @@ import AppLogoIcon from '@/components/app-logo-icon';
 import { home } from '@/routes';
 import type { AuthLayoutProps } from '@/types';
 
+// Layout para tarjetas de autenticación.
 export default function AuthSplitLayout({
     children,
     title,

@@ -11,11 +11,6 @@ import type {
     GraduacionUsuario,
 } from '@/types';
 
-// Header del panel de Graduación. Igual que AppSidebarHeader (Biblioteca),
-// pero con las rutas propias del guard `graduacion`: una vez autenticado,
-// Laravel lo promueve a guard "por defecto" de la petición (Auth::shouldUse
-// en el middleware auth:graduacion), así que `auth.user` sí llega poblado
-// aquí.
 export function GraduacionSidebarHeader({
     breadcrumbs = [],
 }: {

@@ -23,9 +23,7 @@ type Props = {
     requiresConfirmation?: boolean;
 };
 
-// Pantalla de Seguridad del equipo de Graduación: cambio de contraseña y
-// gestión de 2FA, mismo bloque que settings/security.tsx (Biblioteca) pero
-// con las rutas propias del guard 'graduacion'.
+
 export default function Seguridad({
     twoFactorEnabled = false,
     requiresConfirmation = false,

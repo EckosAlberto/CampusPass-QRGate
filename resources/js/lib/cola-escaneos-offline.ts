@@ -1,7 +1,4 @@
 // Cola local (IndexedDB) de escaneos capturados sin conexión, para Eventos
-// Académicos y Graduación: el kiosco puede seguir leyendo credenciales
-// aunque no haya internet, y los envía al servidor en cuanto vuelve la
-// conexión. No se usa en Biblioteca.
 
 const NOMBRE_BASE_DATOS = 'campuspass-offline';
 const VERSION_BASE_DATOS = 1;
@@ -14,6 +11,7 @@ export type EscaneoPendiente = {
     capturadoEn: string;
 };
 
+// Función para abrir la base de datos IndexedDB
 function abrirBaseDatos(): Promise<IDBDatabase> {
     return new Promise((resolve, reject) => {
         if (typeof indexedDB === 'undefined') {

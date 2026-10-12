@@ -191,10 +191,7 @@ export default function RegistroDelDia({
     const [registroSeleccionado, setRegistroSeleccionado] =
         useState<RegistroDelDiaFila | null>(null);
 
-    // Mantiene el campo de búsqueda sincronizado si los filtros cambian desde
-    // fuera (ej. navegación con el botón "atrás" del navegador). Ajustar el
-    // estado durante el render (en vez de en un efecto) evita un re-render
-    // en cascada; ver https://react.dev/learn/you-might-not-need-an-effect.
+    
     const [ultimoBuscarDesdeProps, setUltimoBuscarDesdeProps] = useState(
         filtros.buscar,
     );

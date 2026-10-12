@@ -11,22 +11,10 @@ import {
 type Opciones = {
     /** URL firmada actual de esta pantalla de registro (Eventos/Graduación). */
     urlActual: string;
-    /**
-     * Nombre del componente Inertia que renderiza esta misma pantalla de
-     * registro (p. ej. "eventos/registro"). Sirve para distinguir, al
-     * sincronizar, si el servidor siguió respondiendo esta pantalla (el
-     * escaneo se procesó, válido o no) de si nos mandó a "enlace no
-     * disponible" (la sesión firmada ya expiró y no se puede sincronizar más).
-     */
+    /** Nombre del componente Inertia que procesa los escaneos. */
     componenteRegistro: string;
 };
 
-/**
- * Cola de escaneos pendientes por falta de conexión: guarda cada lectura en
- * IndexedDB mientras no hay internet y la reenvía en cuanto vuelve la
- * conexión, para que el control de acceso no se detenga ante una falla de
- * red. Solo para Eventos Académicos y Graduación (Biblioteca no lo usa).
- */
 export function useColaEscaneosOffline({
     urlActual,
     componenteRegistro,

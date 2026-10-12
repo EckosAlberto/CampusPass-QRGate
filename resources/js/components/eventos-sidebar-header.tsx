@@ -11,11 +11,7 @@ import type {
     EventosUsuario,
 } from '@/types';
 
-// Header del panel de Eventos Académicos. Igual que AppSidebarHeader
-// (Biblioteca), pero con las rutas propias del guard `eventos`: una vez
-// autenticado, Laravel lo promueve a guard "por defecto" de la petición
-// (Auth::shouldUse en el middleware auth:eventos), así que `auth.user` sí
-// llega poblado aquí.
+
 export function EventosSidebarHeader({
     breadcrumbs = [],
 }: {

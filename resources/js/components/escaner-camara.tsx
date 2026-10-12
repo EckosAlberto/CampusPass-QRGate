@@ -13,55 +13,30 @@ type Props = {
     activo: boolean;
     onDecodificado: (codigo: string) => void;
     onError?: () => void;
-    // Formatos a decodificar. Por defecto ambos (QR + código de barras),
-    // pero cada pantalla debe restringirlo al formato real de lo que
-    // escanea: las credenciales físicas del Tec solo traen un código de
-    // barras Code128 legible (su QR apunta a un portal externo que no
-    // puedo resolver), mientras que los boletos propios de CampusPass
-    // (graduación) son QR. Sin restringir, un QR ilegible que quede dentro
-    // del cuadro (como el de la credencial física) puede "ganarle" al
-    // código de barras que sí nos sirve.
+    
     formatos?: BarcodeFormat[];
-    // Contenido a mostrar cubriendo el cuadro de la cámara (p. ej. el
-    // resultado de un escaneo) en vez de los overlays normales de
-    // "cámara iniciando" / "marco de encuadre". El llamador sigue siendo
-    // responsable de pausar la decodificación (prop `activo`) mientras lo
-    // muestra.
+    
     overlay?: ReactNode;
 };
-
+// Formatos de código de barras que se intentarán decodificar por defecto.
 const FORMATOS_POR_DEFECTO = [BarcodeFormat.QR_CODE, BarcodeFormat.CODE_128];
 
-// Milisegundos entre intentos de decodificación sucesivos, para no saturar
-// el hilo principal ni disparar onDecodificado varias veces por el mismo
-// cuadro de video.
+// Retardo entre intentos de decodificación en milisegundos.
 const RETARDO_ENTRE_INTENTOS_MS = 200;
 
-// Si la cámara no da señal (ni un solo intento de decodificación) dentro de
-// este tiempo, se reinicia sola una vez — en algunos equipos, al navegar
-// entre pantallas (sin recargar la página) el stream de video se queda
-// "congelado" en gris y solo una recarga completa lo destrababa; este
-// reintento automático reproduce el mismo efecto sin depender de que
-// alguien recargue la página a mano.
+// Tiempo máximo de espera para que la cámara se inicie y envíe una señal en milisegundos.
 const TIEMPO_ESPERA_CAMARA_MS = 4000;
 
+// Número máximo de reintentos para iniciar la cámara antes de mostrar un error.
 const MAX_REINTENTOS = 1;
 
-// Tope de reinicios automáticos por congelamiento antes de rendirse y pedir
-// recargar la página — evita reintentar en silencio para siempre si el
-// problema es de hardware y no se puede resolver reabriendo la cámara.
+// Número máximo de reintentos cuando la cámara se congela antes de mostrar un error.
 const MAX_REINTENTOS_CONGELADO = 5;
 
-// ZXing dispara su callback de decodificación (con NotFoundException) sobre
-// cada cuadro que logra capturar, incluso si ese cuadro es el mismo de
-// siempre porque el <video> se quedó pintando una imagen fija — por eso el
-// watchdog de arriba, que solo mira si "hubo señal de decodificación", no
-// detecta este caso: cree que la cámara sigue viva aunque el video esté
-// congelado. Para eso se vigila aparte que video.currentTime siga
-// avanzando; si no avanza durante este umbral, se fuerza un reinicio
-// completo (sin límite de reintentos, a diferencia del watchdog inicial,
-// porque esto es un vídeo que sí llegó a funcionar y se puede recuperar).
+// Intervalo de vigilancia para detectar si la cámara se ha congelado en milisegundos.
 const INTERVALO_VIGILANCIA_MS = 1500;
+
+// Umbral de tiempo en milisegundos para considerar que la cámara está congelada.
 const UMBRAL_CONGELADO_MS = 3000;
 
 // Vista de cámara en vivo que decodifica credenciales (QR o código de
@@ -76,9 +51,6 @@ export function EscanerCamara({
     const videoRef = useRef<HTMLVideoElement>(null);
     const onDecodificadoRef = useRef(onDecodificado);
     const onErrorRef = useRef(onError);
-    // Los formatos no deben disparar un reinicio de cámara si el llamador
-    // pasa un array nuevo en cada render (p. ej. un literal inline) — solo
-    // se leen al montar el escáner.
     const formatosRef = useRef(formatos);
 
     const [error, setError] = useState<string | null>(null);
@@ -90,8 +62,6 @@ export function EscanerCamara({
         formatosRef.current = formatos;
     }, [onDecodificado, onError, formatos]);
 
-    // Se incrementa para forzar un reinicio manual/automático del efecto de
-    // abajo sin depender de que cambien `activo` o `formatos`.
     const [reinicio, setReinicio] = useState(0);
     const intentosRef = useRef(0);
     const reintentosCongeladoRef = useRef(0);
@@ -106,10 +76,6 @@ export function EscanerCamara({
             return;
         }
 
-        // Cada vez que arranca una sesión de escaneo nueva (activo pasa a
-        // true), se reinicia el contador de reintentos — si no, una sesión
-        // anterior que ya reintentó una vez dejaría a la siguiente sin
-        // margen.
         if (!activoAnteriorRef.current) {
             intentosRef.current = 0;
             reintentosCongeladoRef.current = 0;
@@ -129,10 +95,6 @@ export function EscanerCamara({
 
         const hints = new Map<DecodeHintType, unknown>([
             [DecodeHintType.POSSIBLE_FORMATS, formatosRef.current],
-            // Un código de barras 1D (como el de las credenciales físicas)
-            // necesita bastante más resolución/precisión que un QR para
-            // decodificarse desde una webcam genérica — sin esto, el lector
-            // 1D casi nunca alcanza a leerlo a tiempo.
             [DecodeHintType.TRY_HARDER, true],
         ]);
         const lector = new BrowserMultiFormatReader(hints, {
@@ -157,10 +119,6 @@ export function EscanerCamara({
                 if (resultado) {
                     recibioSenal = true;
                     setListo(true);
-
-                    // decodeFromConstraints puede volver a llamar el
-                    // callback con el mismo resultado antes de que el
-                    // componente padre alcance a desactivar `activo`.
                     if (!yaDecodificado) {
                         yaDecodificado = true;
                         onDecodificadoRef.current(resultado.getText());
@@ -169,9 +127,6 @@ export function EscanerCamara({
                     return;
                 }
 
-                // ZXing dispara NotFoundException en cada cuadro sin código
-                // detectado: es el flujo normal mientras no hay nada frente
-                // a la cámara, no un error real.
                 if (err && !(err instanceof NotFoundException)) {
                     return;
                 }
@@ -229,11 +184,6 @@ export function EscanerCamara({
                 return;
             }
 
-            // Sin condición de readyState: si el video nunca llega a tener
-            // un cuadro real (se queda en 0 desde el inicio, no que se
-            // pegue después de andar bien), readyState jamás avanzaría y
-            // esta vigilancia nunca actuaría — el umbral de tiempo ya da
-            // margen de sobra para un arranque normal.
             if (Date.now() - ultimoAvanceEn < UMBRAL_CONGELADO_MS) {
                 return;
             }

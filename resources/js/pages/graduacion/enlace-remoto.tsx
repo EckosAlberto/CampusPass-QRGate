@@ -5,8 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Fieldset, FieldsetLegend } from '@/components/ui/fieldset';
 import type { EnlaceRemotoProps } from '@/types';
 
-// Intervalo de refresco para simular consulta "en tiempo real" sin
-// necesidad de WebSockets, consistente con el resto del proyecto.
+
 const INTERVALO_ACTUALIZACION_MS = 10000;
 
 export default function EnlaceRemoto({
