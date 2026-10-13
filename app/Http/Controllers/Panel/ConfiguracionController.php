@@ -48,7 +48,8 @@ class ConfiguracionController extends Controller
             'roles' => $this->serializarRoles(),
             'permisos' => $this->serializarMatrizPermisos(),
             'horarios' => HorarioBiblioteca::query()->get()
-                ->sortBy(fn (HorarioBiblioteca $h) => array_search($h->dia, HorarioBiblioteca::DIAS))
+                ->sortBy(fn (HorarioBiblioteca $h) => array_search($h->dia, ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo']))
+                ->values()
                 ->values()
                 ->map(fn (HorarioBiblioteca $h) => [
                     'dia' => $h->dia,
