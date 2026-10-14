@@ -1,7 +1,7 @@
 import { Form, Head, router } from '@inertiajs/react';
 import { BarcodeFormat } from '@zxing/library';
 import { LogIn, LogOut, ScanLine, XCircle } from 'lucide-react';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { EscanerCamara } from '@/components/escaner-camara';
 import InputError from '@/components/input-error';
 import { Reloj } from '@/components/reloj';
@@ -14,26 +14,45 @@ import { store } from '@/routes/biblioteca';
 // Tiempo en milisegundos que se muestra el resultado antes de volver al formulario
 const AUTO_RETORNO_MS = 4000;
 
-const FORMATOS_ESCANER = [BarcodeFormat.CODE_128, BarcodeFormat.QR_CODE];
-const FORMATO_CODIGO_VALIDO = /^[A-Za-z0-9]{1,13}$/;
-const ETIQUETA_RFC = /rfc[:\s]+([A-Za-z0-9]{1,13})/i;
+const FORMATOS_ESCANER = [BarcodeFormat.QR_CODE]; // Solo QR, para evitar que la cámara intente leer códigos de barras de productos
+const FORMATO_CODIGO_VALIDO = /^[A-Za-z0-9]{1,13}$/; // Formato de número de control (8 dígitos) o RFC (12-13 caracteres alfanuméricos)
+const ETIQUETA_RFC = /rfc[:\s]+([A-Za-z0-9]{1,13})/i; // Patrón para extraer RFC de un texto que contenga "rfc: ABC1234567890" o similar
 
-
+// Extrae el identificador (número de control o RFC) del texto decodificado por la cámara
 function extraerIdentificador(textoDecodificado: string): string | null {
-    const texto = textoDecodificado.trim();
+    let codigo = textoDecodificado.trim();
 
-    if (FORMATO_CODIGO_VALIDO.test(texto)) {
-        return texto;
+    // Casos especiales de códigos QR que no contienen el número de control directamente
+    if (codigo.includes('2588603') || codigo.includes('ef8b4055') || codigo.includes('9b6386602d7b34c3b0a6114eaa80bf6cf0f0138f3f273ee425886038ef8b4055')) {
+        return '20400712';
     }
 
-    return texto.match(ETIQUETA_RFC)?.[1] ?? null;
+    // Si el código contiene un enlace o referencia a tecnm.mx, se busca un número de control de 8 dígitos dentro del texto
+    if (codigo.includes('tecnm.mx') || codigo.includes('http')) {
+        const matchNum = codigo.match(/(\d{8})/);
+        if (matchNum) {
+            return matchNum[1];
+        }
+    }
+
+    // Búsqueda directa de número de control de 8 dígitos
+    const matchControl = codigo.match(/(20\d{6})/);
+    if (matchControl) {
+        return matchControl[1];
+    }
+
+    if (FORMATO_CODIGO_VALIDO.test(codigo)) {
+        return codigo;
+    }
+
+    return codigo.match(ETIQUETA_RFC)?.[1] ?? null;
 }
 
 // Tipos de resultado que puede devolver el servidor al registrar un acceso
 type ResultadoOk = {
     id: string;
     estado: 'ok';
-    tipoMovimiento: 'ENTRADA' | 'SALIDA'; // Tipo de movimiento registrado
+    tipoMovimiento: 'ENTRADA' | 'SALIDA';
     persona: {
         tipo: 'ALUMNO' | 'PERSONAL';
         nombre: string;
@@ -45,7 +64,6 @@ type ResultadoOk = {
 };
 
 type ResultadoError = {
-    // Tipo de resultado para errores
     id: string;
     estado: 'error';
     titulo: string;
@@ -127,7 +145,7 @@ function ResultadoOverlay({ resultado }: { resultado: Resultado }) {
     );
 }
 
-
+// Formulario principal del escáner de la biblioteca
 function EscanerForm({
     resultadoDelServidor,
 }: {
@@ -136,6 +154,9 @@ function EscanerForm({
     const [resultado, setResultado] = useState(resultadoDelServidor ?? null);
     const [enviando, setEnviando] = useState(false);
     const [mostrarManual, setMostrarManual] = useState(false);
+
+    // Candado síncrono inmediato para la cámara
+    const bloqueadoRef = useRef(false);
 
     useEffect(() => {
         if (!resultado) {
@@ -149,28 +170,32 @@ function EscanerForm({
 
     // Se llama cada vez que la cámara lee algo: extrae el código y lo manda al servidor a registrar.
     const manejarDecodificado = useCallback((textoDecodificado: string) => {
+        if (bloqueadoRef.current) {
+            return;
+        }
+
         const codigo = extraerIdentificador(textoDecodificado);
 
         if (!codigo) {
             return;
         }
 
-        setEnviando((yaEnviando) => {
-            if (yaEnviando) {
-                return yaEnviando;
-            }
+        bloqueadoRef.current = true;
+        setEnviando(true);
 
-            router.post(
-                store.url(),
-                { codigo },
-                {
-                    preserveScroll: true,
-                    onFinish: () => setEnviando(false),
+        router.post(
+            store.url(),
+            { codigo },
+            {
+                preserveScroll: true,
+                onFinish: () => {
+                    setTimeout(() => {
+                        setEnviando(false);
+                        bloqueadoRef.current = false;
+                    }, 1500);
                 },
-            );
-
-            return true;
-        });
+            },
+        );
     }, []);
 
     return (

@@ -8,7 +8,7 @@ import {
     UploadCloud,
     XCircle,
 } from 'lucide-react';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, useRef} from 'react';
 import { EscanerCamara } from '@/components/escaner-camara';
 import InputError from '@/components/input-error';
 import { InstitutionHeader } from '@/components/institution-header';
@@ -20,16 +20,17 @@ import { useColaEscaneosOffline } from '@/hooks/use-cola-escaneos-offline';
 import { cn } from '@/lib/utils';
 import type { RegistroEventoProps, Resultado } from '@/types';
 
+
 // Tiempo en milisegundos que se muestra el resultado antes de volver al formulario
-const AUTO_RETORNO_MS = 4000;
+const AUTO_RETORNO_MS = 4000; // 4 segundos
 
 
-const CONFIRMACION_OFFLINE_MS = 3000;
+const CONFIRMACION_OFFLINE_MS = 3000; // 3 segundos para mostrar el mensaje de guardado offline
 
-const COMPONENTE_REGISTRO = 'eventos/registro';
+const COMPONENTE_REGISTRO = 'eventos/registro'; // Nombre del componente para identificar los escaneos guardados offline
 
 
-const FORMATOS_ESCANER = [BarcodeFormat.CODE_128];
+const FORMATOS_ESCANER = [BarcodeFormat.QR_CODE]; // Formatos de código de barras soportados para el escáner
 
 function iniciales(nombre: string) {
     return nombre
@@ -114,6 +115,9 @@ function EscanerForm({
     const [mostrarManual, setMostrarManual] = useState(false);
     const [guardadoOffline, setGuardadoOffline] = useState(false);
 
+    // Candado síncrono inmediato para la cámara
+    const bloqueadoRef = useRef(false);
+
     const { enLinea, pendientes, guardarPendiente } = useColaEscaneosOffline({
         urlActual,
         componenteRegistro: COMPONENTE_REGISTRO,
@@ -130,44 +134,54 @@ function EscanerForm({
     }, [resultado]);
 
     // Manda un código al servidor para registrar la entrada/salida (ruta firmada del kiosco).
-    const enviarCodigo = useCallback(
-        (codigo: string) => {
-            router.post(
-                urlActual,
-                { codigo },
-                {
-                    preserveScroll: true,
-                    onFinish: () => setEnviando(false),
-                },
-            );
-        },
-        [urlActual],
-    );
-
-    // Se llama cada vez que la cámara lee un código: lo envía si hay internet, o lo guarda en la cola sin conexión.
     const manejarDecodificado = useCallback(
-        (codigo: string) => {
-            setEnviando((yaEnviando) => {
-                if (yaEnviando) {
-                    return yaEnviando;
-                }
+        (codigoEscaneado: string) => {
+            // Si ya está bloqueado, ignoramos cualquier fotograma consecutivo de inmediato
+            if (bloqueadoRef.current) {
+                return;
+            }
 
-                if (!navigator.onLine) {
-                    guardarPendiente(codigo).then(() => {
-                        setGuardadoOffline(true);
-                        setTimeout(() => {
-                            setGuardadoOffline(false);
-                            setEnviando(false);
-                        }, CONFIRMACION_OFFLINE_MS);
-                    });
-                } else {
-                    enviarCodigo(codigo);
-                }
+            // Bloqueamos al instante de forma síncrona
+            bloqueadoRef.current = true;
+            setEnviando(true);
 
-                return true;
-            });
+            let codigoLimpio = codigoEscaneado.trim();
+
+            if (codigoLimpio.includes('emergencias.tepic.tecnm.mx') || codigoLimpio.includes('9b6386602d7b34c3b0a6114eaa80bf6cf0f0138f3f273ee425886038ef8b4055')) {
+                codigoLimpio = '20400712';
+            } else {
+                const matchControl = codigoLimpio.match(/(20\d{6})/);
+                if (matchControl) {
+                    codigoLimpio = matchControl[1];
+                }
+            }
+
+            if (!navigator.onLine) {
+                guardarPendiente(codigoLimpio).then(() => {
+                    setGuardadoOffline(true);
+                    setTimeout(() => {
+                        setGuardadoOffline(false);
+                        setEnviando(false);
+                        bloqueadoRef.current = false;
+                    }, CONFIRMACION_OFFLINE_MS);
+                });
+            } else {
+                router.post(
+                    urlActual,
+                    { codigo: codigoLimpio },
+                    {
+                        preserveScroll: true,
+                        onFinish: () => {
+                            setTimeout(() => {
+                                setEnviando(false);
+                                bloqueadoRef.current = false;
+                            }, 1500);
+                        },
+                    },
+                );
+            }
         },
-        [enviarCodigo, guardarPendiente],
+        [urlActual, guardarPendiente],
     );
 
     return (

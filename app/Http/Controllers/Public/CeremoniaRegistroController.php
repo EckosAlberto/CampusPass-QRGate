@@ -178,7 +178,7 @@ class CeremoniaRegistroController extends Controller
                         ->where('no_de_control', $alumno->no_de_control)
                         ->where('tipo', BoletoGraduacion::TIPO_INVITADO)
                         ->first();
-
+                    // Retorna un arreglo con la información del resultado del escaneo, incluyendo el estado, tipo de boleto, información del alumno, hora del registro, invitados autorizados y registrados, lugares disponibles y un mensaje de éxito según el tipo de boleto.
                     return [ 
                         'estado' => 'ok',
                         'tipoBoleto' => $boleto->tipo,
@@ -198,7 +198,7 @@ class CeremoniaRegistroController extends Controller
                             : '¡Bienvenido! Tu entrada como invitado quedó registrada.',
                     ];
                 });
-        } catch (LockTimeoutException) {
+        } catch (LockTimeoutException) { // Si ocurre un error de bloqueo (por ejemplo, si otro escaneo está siendo procesado al mismo tiempo), se devuelve un mensaje de error indicando que el sistema está ocupado y que se intente nuevamente más tarde.
             
             $resultado = [
                 'estado' => 'error',
@@ -207,9 +207,10 @@ class CeremoniaRegistroController extends Controller
             ];
         }
 
-        return back()->with('resultado', $this->conId($resultado));
+        return back()->with('resultado', $this->conId($resultado)); // Devuelve la respuesta final con el resultado del escaneo, ya sea exitoso o con algún error, incluyendo un ID único para identificar la respuesta.
     }
 
+    // Registra una incidencia de acceso a la ceremonia de graduación en la base de datos, incluyendo el código escaneado, el ID de la ceremonia, el tipo de incidencia, un mensaje descriptivo y la fecha y hora del escaneo (si se proporciona).
     private function registrarIncidencia(?string $codigo, string $idCeremonia, string $tipo, string $mensaje, ?CarbonInterface $fechaHora = null): void
     {
         IncidenciaAccesoGraduacion::create([
@@ -221,7 +222,7 @@ class CeremoniaRegistroController extends Controller
         ]);
     }
 
-    
+    // Agrega un ID único a los datos proporcionados y devuelve un arreglo con el ID y los datos originales. Esto se utiliza para identificar de manera única cada resultado de escaneo en la respuesta.
     private function conId(array $datos): array
     {
         return ['id' => (string) Str::uuid(), ...$datos];

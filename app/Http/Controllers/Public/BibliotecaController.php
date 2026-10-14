@@ -19,7 +19,7 @@ use Inertia\Response;
 class BibliotecaController extends Controller
 {
     // Ventana de tiempo en segundos para considerar un escaneo como duplicado.
-    private const VENTANA_DOBLE_ESCANEO_SEGUNDOS = 5;
+    private const VENTANA_DOBLE_ESCANEO_SEGUNDOS = 10;
 
     /**
      * Muestra la página de registro de acceso a la biblioteca.
@@ -61,8 +61,8 @@ class BibliotecaController extends Controller
         }
 
         // ¿Usuario registrado? Primero se busca como alumno, luego como personal.
-        $alumno = Alumno::find($codigo);
-        $personal = $alumno ? null : Personal::find(strtoupper($codigo));
+        $alumno = Alumno::where('no_de_control', $codigo)->first();
+        $personal = $alumno ? null : Personal::where('rfc', strtoupper($codigo))->first();
 
         if (! $alumno && ! $personal) {
             $this->registrarIncidencia($codigo, $ubicacion->id, IncidenciaAcceso::NO_REGISTRADO, "Código no encontrado: {$codigo}");
@@ -85,10 +85,12 @@ class BibliotecaController extends Controller
             ]));
         }
 
+        // Determina la columna e identificador según si es alumno o personal.
         $columnaIdentificador = $alumno ? 'no_de_control' : 'rfc_personal';
         $identificador = $alumno ? $alumno->no_de_control : $personal->rfc;
 
-        
+        // Se utiliza un lock para evitar que dos escaneos simultáneos del mismo usuario
+        // generen registros duplicados. Se bloquea por 10 segundos y se espera hasta 5 segundos para adquirir el lock.
         try {
             $resultado = Cache::lock("registro-acceso:biblioteca:{$identificador}", 10)
                 ->block(5, function () use ($columnaIdentificador, $identificador, $ubicacion, $codigo, $alumno, $personal) {
@@ -112,6 +114,7 @@ class BibliotecaController extends Controller
                     // Determina Entrada/Salida según el último movimiento del día.
                     $tipoMovimiento = $ultimoRegistro?->tipo_movimiento === 'ENTRADA' ? 'SALIDA' : 'ENTRADA';
 
+                    // Registra el movimiento en la base de datos.
                     $registro = RegistroAcceso::create([
                         $columnaIdentificador => $identificador,
                         'id_ubicacion' => $ubicacion->id,
@@ -119,6 +122,7 @@ class BibliotecaController extends Controller
                         'fecha_hora' => now(),
                     ]);
 
+                    // Retorna la información para mostrar en la interfaz.
                     return [
                         'estado' => 'ok',
                         'tipoMovimiento' => $tipoMovimiento,
@@ -139,7 +143,7 @@ class BibliotecaController extends Controller
                             : '¡Gracias por visitarnos! Te esperamos nuevamente.',
                     ];
                 });
-        } catch (LockTimeoutException) { 
+        } catch (LockTimeoutException) { // No se pudo adquirir el lock en 5 segundos, lo que indica que otro escaneo está en proceso.
             
             $resultado = [
                 'estado' => 'error',
@@ -148,7 +152,7 @@ class BibliotecaController extends Controller
             ];
         }
 
-        return back()->with('resultado', $this->conId($resultado));
+        return back()->with('resultado', $this->conId($resultado)); // Se agrega un ID único para que Inertia detecte el cambio y actualice la interfaz.
     }
 
     // Registra una incidencia de acceso en la base de datos.
@@ -164,7 +168,7 @@ class BibliotecaController extends Controller
         ]);
     }
 
-    
+    // Agrega un ID único a los datos para que Inertia detecte cambios y actualice la interfaz.
     private function conId(array $datos): array
     {
         return ['id' => (string) Str::uuid(), ...$datos];

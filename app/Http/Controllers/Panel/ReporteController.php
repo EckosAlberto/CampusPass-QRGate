@@ -39,12 +39,14 @@ class ReporteController extends Controller
     /** Pantalla de Reportes: la lista de reportes ya generados. */
     public function index(Request $request): Response
     {
+        // Se obtienen los reportes de la biblioteca, incluyendo la información del usuario que los generó, ordenados por fecha de creación descendente y paginados.
         $reportes = ReporteBiblioteca::query()
             ->with('generadoPor')
             ->orderByDesc('created_at')
             ->paginate(self::POR_PAGINA)
             ->withQueryString();
 
+        // Se renderiza la vista de reportes, pasando los datos necesarios para mostrar la lista de reportes, los filtros disponibles y la información del usuario actual.
         return Inertia::render('panel/reportes', [
             'usuarioId' => $request->user()->id,
             'reportes' => [
@@ -57,7 +59,7 @@ class ReporteController extends Controller
                     'hasta' => $reportes->lastItem(),
                 ],
             ],
-            'catalogos' => [
+            'catalogos' => [ // Se pasan los catálogos de opciones para los filtros de carrera, semestre, sexo, tipo de movimiento y tipo de reporte.
                 'carreras' => $this->opcionesCarreras(),
                 'semestres' => collect(range(1, 12))
                     ->map(fn (int $semestre) => ['value' => (string) $semestre, 'label' => "{$semestre}°"])
@@ -80,6 +82,7 @@ class ReporteController extends Controller
     /** Botón "Generar reporte" */
     public function store(Request $request): RedirectResponse
     {
+        // Se validan los filtros enviados en la solicitud, asegurándose de que las fechas sean válidas, que el tipo de reporte sea uno de los permitidos y que los demás filtros sean opcionales y cumplan con sus restricciones.
         $filtros = $request->validate([
             'fecha_inicial' => ['required', 'date'],
             'fecha_final' => ['required', 'date', 'after_or_equal:fecha_inicial'],
@@ -100,6 +103,7 @@ class ReporteController extends Controller
             Carbon::parse($filtros['fecha_final'])->format('d/m/Y'),
         );
 
+        // Se crea un nuevo registro de reporte en la base de datos, guardando el nombre del reporte, el tipo, la ubicación (Biblioteca), los filtros aplicados, las fechas, el total de registros y los datos calculados, así como el ID del usuario que generó el reporte.
         $reporte = ReporteBiblioteca::create([
             'nombre' => $nombre,
             'tipo' => $filtros['tipo'],

@@ -8,39 +8,23 @@ import { Camera } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 
-// Props para el componente EscanerCamara
 type Props = {
     activo: boolean;
     onDecodificado: (codigo: string) => void;
     onError?: () => void;
-    
     formatos?: BarcodeFormat[];
-    
     overlay?: ReactNode;
 };
-// Formatos de código de barras que se intentarán decodificar por defecto.
-const FORMATOS_POR_DEFECTO = [BarcodeFormat.QR_CODE, BarcodeFormat.CODE_128];
 
-// Retardo entre intentos de decodificación en milisegundos.
-const RETARDO_ENTRE_INTENTOS_MS = 200;
-
-// Tiempo máximo de espera para que la cámara se inicie y envíe una señal en milisegundos.
-const TIEMPO_ESPERA_CAMARA_MS = 4000;
-
-// Número máximo de reintentos para iniciar la cámara antes de mostrar un error.
-const MAX_REINTENTOS = 1;
-
-// Número máximo de reintentos cuando la cámara se congela antes de mostrar un error.
-const MAX_REINTENTOS_CONGELADO = 5;
-
-// Intervalo de vigilancia para detectar si la cámara se ha congelado en milisegundos.
-const INTERVALO_VIGILANCIA_MS = 1500;
-
-// Umbral de tiempo en milisegundos para considerar que la cámara está congelada.
+const FORMATOS_POR_DEFECTO = [BarcodeFormat.QR_CODE, BarcodeFormat.CODE_128]; // Se incluyen los formatos más comunes para credenciales y códigos QR
+const RETARDO_ENTRE_INTENTOS_MS = 100; // Reducido para agilizar la lectura
+const TIEMPO_ESPERA_CAMARA_MS = 4000; // Tiempo máximo para que la cámara comience a transmitir antes de mostrar un error
+const MAX_REINTENTOS = 1; // Se permite un solo reintento para evitar bucles de reinicio
+const MAX_REINTENTOS_CONGELADO = 5; // Número máximo de reintentos permitidos cuando la cámara está congelada
+const INTERVALO_VIGILANCIA_MS = 1500; // Intervalo para verificar si la cámara está congelada
 const UMBRAL_CONGELADO_MS = 3000;
 
-// Vista de cámara en vivo que decodifica credenciales (QR o código de
-// barras) usando ZXing.
+// Componente React para escanear códigos de barras y QR usando la cámara del dispositivo
 export function EscanerCamara({
     activo,
     onDecodificado,
@@ -72,7 +56,6 @@ export function EscanerCamara({
 
         if (!video || !activo) {
             activoAnteriorRef.current = activo;
-
             return;
         }
 
@@ -82,7 +65,6 @@ export function EscanerCamara({
         }
 
         activoAnteriorRef.current = true;
-
         setError(null);
         setListo(false);
 
@@ -106,8 +88,8 @@ export function EscanerCamara({
             {
                 video: {
                     facingMode: 'environment',
-                    width: { ideal: 1920 },
-                    height: { ideal: 1080 },
+                    width: { ideal: 1280 },
+                    height: { ideal: 720 },
                 },
             },
             video,
@@ -123,7 +105,6 @@ export function EscanerCamara({
                         yaDecodificado = true;
                         onDecodificadoRef.current(resultado.getText());
                     }
-
                     return;
                 }
 
@@ -144,7 +125,6 @@ export function EscanerCamara({
                 if (cancelado) {
                     return;
                 }
-
                 setError(
                     'No se pudo acceder a la cámara. Verifica que el navegador tenga permiso de cámara e inténtalo de nuevo.',
                 );
@@ -159,7 +139,6 @@ export function EscanerCamara({
             if (intentosRef.current < MAX_REINTENTOS) {
                 intentosRef.current += 1;
                 setReinicio((previo) => previo + 1);
-
                 return;
             }
 
@@ -180,7 +159,6 @@ export function EscanerCamara({
             if (video.currentTime !== ultimoTiempoVideo) {
                 ultimoTiempoVideo = video.currentTime;
                 ultimoAvanceEn = Date.now();
-
                 return;
             }
 
@@ -193,7 +171,6 @@ export function EscanerCamara({
                     'La cámara dejó de responder. Recarga la página e inténtalo de nuevo.',
                 );
                 onErrorRef.current?.();
-
                 return;
             }
 
@@ -225,11 +202,11 @@ export function EscanerCamara({
     }
 
     return (
-        <div className="mt-6 flex w-full max-w-sm flex-col items-center gap-3">
+        <div className="mt-6 flex w-full max-w-md flex-col items-center gap-3">
             <div className="relative w-full overflow-hidden rounded-2xl border-2 border-emerald-200 bg-emerald-50/60 dark:border-emerald-900 dark:bg-emerald-950/30">
                 <video
                     ref={videoRef}
-                    className="aspect-square w-full object-cover"
+                    className="aspect-video w-full object-cover"
                     muted
                     playsInline
                 />
@@ -248,8 +225,9 @@ export function EscanerCamara({
                             </div>
                         )}
                         {listo && (
-                            <div className="pointer-events-none absolute inset-0 flex items-center justify-center p-8">
-                                <div className="aspect-square w-full max-w-[80%] rounded-xl border-4 border-dashed border-white/80 shadow-[0_0_0_9999px_rgba(0,0,0,0.25)]" />
+                            <div className="pointer-events-none absolute inset-0 flex items-center justify-center p-6">
+                                {/* Cuadro de escaneo */}
+                                <div className="h-48 w-full max-w-[85%] rounded-xl border-4 border-dashed border-white/90 shadow-[0_0_0_9999px_rgba(0,0,0,0.3)]" />
                             </div>
                         )}
                     </>
