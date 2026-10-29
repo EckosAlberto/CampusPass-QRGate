@@ -118,9 +118,9 @@ class ConfiguracionController extends Controller
         $this->verificarPermiso($request);
 
         $datos = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'apellido_paterno' => ['required', 'string', 'max:100'],
-            'apellido_materno' => ['required', 'string', 'max:100'],
+            'name' => ['required', 'string', 'max:255', 'regex:/^[\pL\s]+$/u'],
+            'apellido_paterno' => ['required', 'string', 'max:100', 'regex:/^[\pL\s]+$/u'],
+            'apellido_materno' => ['required', 'string', 'max:100', 'regex:/^[\pL\s]+$/u'],
             'email' => ['required', 'email', 'max:255', 'unique:users,email'],
             'tipo' => ['required', Rule::in(RolesInstitucionales::nombres())],
             'password' => $this->passwordRules(),
@@ -147,16 +147,15 @@ class ConfiguracionController extends Controller
 
         return back()->with('success', 'Usuario creado.');
     }
-
     
     public function updateUsuario(Request $request, User $usuario): RedirectResponse
     {
         $this->verificarPermiso($request);
 
         $datos = $request->validate([
-            'name' => ['sometimes', 'string', 'max:255'],
-            'apellido_paterno' => ['sometimes', 'string', 'max:100'],
-            'apellido_materno' => ['sometimes', 'string', 'max:100'],
+            'name' => ['sometimes', 'string', 'max:255', 'regex:/^[\pL\s]+$/u'],
+            'apellido_paterno' => ['sometimes', 'string', 'max:100', 'regex:/^[\pL\s]+$/u'],
+            'apellido_materno' => ['sometimes', 'string', 'max:100', 'regex:/^[\pL\s]+$/u'],
             'email' => ['sometimes', 'email', 'max:255', Rule::unique('users', 'email')->ignore($usuario->id)],
             'tipo' => ['sometimes', Rule::in(RolesInstitucionales::nombres())],
             'activo' => ['sometimes', 'boolean'],
@@ -202,7 +201,6 @@ class ConfiguracionController extends Controller
         return back()->with('success', 'Usuario eliminado.');
     }
 
-    
     public function actualizarPermisos(Request $request): RedirectResponse
     {
         $this->verificarPermiso($request);
@@ -248,7 +246,7 @@ class ConfiguracionController extends Controller
 
         $datos = $request->validate([
             'dias' => ['required', 'array'],
-            'dias.*.dia' => ['required', Rule::in(HorarioBiblioteca::DIAS)],
+            'dias.*.dia' => ['required', Rule::in(['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'])],
             'dias.*.abierto' => ['required', 'boolean'],
             'dias.*.apertura' => ['required', 'date_format:H:i'],
             'dias.*.cierre' => ['required', 'date_format:H:i', 'after:dias.*.apertura'],
@@ -293,7 +291,6 @@ class ConfiguracionController extends Controller
         return back()->with('success', 'Excepción eliminada.');
     }
 
-    
     public function actualizarNotificacionesEventos(Request $request): RedirectResponse
     {
         $this->verificarPermiso($request);
@@ -341,7 +338,6 @@ class ConfiguracionController extends Controller
         return response()->json(['lineas' => $lineas]);
     }
 
-    
     public function respaldarBaseDeDatos(Request $request): StreamedResponse|RedirectResponse
     {
         $this->verificarPermiso($request);
@@ -448,7 +444,6 @@ class ConfiguracionController extends Controller
         ];
     }
 
-    
     private function nombrePila(User $usuario): string
     {
         $sufijo = trim("{$usuario->apellido_paterno} {$usuario->apellido_materno}");

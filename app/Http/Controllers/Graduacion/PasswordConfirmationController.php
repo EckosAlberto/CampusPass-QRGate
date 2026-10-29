@@ -14,13 +14,11 @@ use Laravel\Fortify\Actions\ConfirmPassword;
 
 class PasswordConfirmationController extends Controller
 {
-    
     public function show(): Response
     {
         return Inertia::render('graduacion/confirmar-password');
     }
-
-    
+   
     public function store(Request $request, ConfirmPassword $confirm): RedirectResponse
     {
         $request->validate(['password' => ['required', 'string']]);

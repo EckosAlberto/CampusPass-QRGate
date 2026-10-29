@@ -16,15 +16,14 @@ type Props = {
     overlay?: ReactNode;
 };
 
-const FORMATOS_POR_DEFECTO = [BarcodeFormat.QR_CODE, BarcodeFormat.CODE_128]; // Se incluyen los formatos más comunes para credenciales y códigos QR
-const RETARDO_ENTRE_INTENTOS_MS = 100; // Reducido para agilizar la lectura
-const TIEMPO_ESPERA_CAMARA_MS = 4000; // Tiempo máximo para que la cámara comience a transmitir antes de mostrar un error
-const MAX_REINTENTOS = 1; // Se permite un solo reintento para evitar bucles de reinicio
-const MAX_REINTENTOS_CONGELADO = 5; // Número máximo de reintentos permitidos cuando la cámara está congelada
-const INTERVALO_VIGILANCIA_MS = 1500; // Intervalo para verificar si la cámara está congelada
+const FORMATOS_POR_DEFECTO = [BarcodeFormat.QR_CODE];
+const RETARDO_ENTRE_INTENTOS_MS = 50;
+const TIEMPO_ESPERA_CAMARA_MS = 4000;
+const MAX_REINTENTOS = 1;
+const MAX_REINTENTOS_CONGELADO = 5;
+const INTERVALO_VIGILANCIA_MS = 1500;
 const UMBRAL_CONGELADO_MS = 3000;
 
-// Componente React para escanear códigos de barras y QR usando la cámara del dispositivo
 export function EscanerCamara({
     activo,
     onDecodificado,
@@ -83,7 +82,7 @@ export function EscanerCamara({
             delayBetweenScanAttempts: RETARDO_ENTRE_INTENTOS_MS,
             delayBetweenScanSuccess: 1000,
         });
-
+        
         const controlesPromesa = lector.decodeFromConstraints(
             {
                 video: {
@@ -206,7 +205,7 @@ export function EscanerCamara({
             <div className="relative w-full overflow-hidden rounded-2xl border-2 border-emerald-200 bg-emerald-50/60 dark:border-emerald-900 dark:bg-emerald-950/30">
                 <video
                     ref={videoRef}
-                    className="aspect-video w-full object-cover"
+                    className="aspect-\[4\/3\] w-full object-cover"
                     muted
                     playsInline
                 />
@@ -226,8 +225,13 @@ export function EscanerCamara({
                         )}
                         {listo && (
                             <div className="pointer-events-none absolute inset-0 flex items-center justify-center p-6">
-                                {/* Cuadro de escaneo */}
-                                <div className="h-48 w-full max-w-[85%] rounded-xl border-4 border-dashed border-white/90 shadow-[0_0_0_9999px_rgba(0,0,0,0.3)]" />
+                                {/* Visor rectangular adaptado a credencial con esquinas guía */}
+                                <div className="relative h-56 w-full max-w-[92%] rounded-2xl shadow-[0_0_0_9999px_rgba(0,0,0,0.2)]">
+                                    <div className="absolute top-0 left-0 h-8 w-8 border-t-4 border-l-4 border-white rounded-tl-xl" />
+                                    <div className="absolute top-0 right-0 h-8 w-8 border-t-4 border-r-4 border-white rounded-tr-xl" />
+                                    <div className="absolute bottom-0 left-0 h-8 w-8 border-b-4 border-l-4 border-white rounded-bl-xl" />
+                                    <div className="absolute bottom-0 right-0 h-8 w-8 border-b-4 border-r-4 border-white rounded-br-xl" />
+                                </div>
                             </div>
                         )}
                     </>

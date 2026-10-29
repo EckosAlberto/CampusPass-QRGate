@@ -54,27 +54,97 @@ class CeremoniaController extends Controller
         ]);
     }
 
-    /** Botón "+ Nueva ceremonia": crea la ceremonia con un folio consecutivo nuevo. */
+    /** Se crea la ceremonia */
     public function store(StoreCeremoniaRequest $request): RedirectResponse
     {
         $datos = $request->validated();
+        
+        // Se automatiza la detección o creación del periodo escolar según la fecha de inicio
+        $fechaInicio = \Illuminate\Support\Carbon::parse($datos['fecha_inicio']);
+        $anio = $fechaInicio->year;
+        $semestre = $fechaInicio->month <= 6 ? '1' : '2'; 
+        $codigoPeriodo = "{$anio}{$semestre}"; 
+        
+        $nombreCorto = $fechaInicio->month <= 6 
+            ? "Enero-Junio {$anio}" 
+            : "Agosto-Diciembre {$anio}";
+
+        $periodoEscolar = PeriodoEscolar::firstOrCreate(
+            ['periodo' => $codigoPeriodo],
+            [
+                'identificacion_corta' => $nombreCorto,
+                'fecha_inicio' => $fechaInicio->copy()->startOfYear(),
+                'fecha_fin' => $fechaInicio->copy()->endOfYear(),
+            ]
+        );
+
+        $datos['periodo'] = $periodoEscolar->periodo;
+
         $carreras = $datos['carreras'] ?? [];
         unset($datos['carreras']);
 
-        $ceremonia = DB::transaction(function () use ($datos, $request) {
+        $ceremonia = DB::transaction(function () use ($datos, $request, $carreras) {
             $folio = (int) (CeremoniaGraduacion::query()->lockForUpdate()->max('folio')) + 1;
 
-            return CeremoniaGraduacion::create([
+            $ceremoniaCreada = CeremoniaGraduacion::create([
                 ...$datos,
                 'folio' => $folio,
                 'estatus' => true,
                 'creado_por' => $request->user('graduacion')->id,
             ]);
+
+            // Se sincroniza las carreras participantes de la ceremonia
+            foreach ($carreras as $carrera) {
+                CeremoniaCarrera::create([
+                    'fk_id_ceremonia' => $ceremoniaCreada->id,
+                    'carrera' => $carrera['carrera'],
+                    'reticula' => $carrera['reticula'],
+                ]);
+            }
+
+            // Generación automática de boletos para los alumnos de las carreras seleccionadas
+            $queryAlumnos = \App\Models\Alumno::query();
+            
+            if (!empty($carreras)) {
+                $queryAlumnos->where(function ($q) use ($carreras) {
+                    foreach ($carreras as $carrera) {
+                        $q->orWhere(function ($sub) use ($carrera) {
+                            $sub->where('carrera', $carrera['carrera'])
+                                ->where('reticula', $carrera['reticula']);
+                        });
+                    }
+                });
+            }
+
+            $alumnos = $queryAlumnos->get();
+
+            // Se crea los boletos para cada alumno encontrado
+            foreach ($alumnos as $alumno) {
+                // Boleto de Graduado
+                BoletoGraduacion::create([
+                    'fk_id_ceremonia' => $ceremoniaCreada->id,
+                    'no_de_control' => $alumno->no_de_control, 
+                    'tipo' => BoletoGraduacion::TIPO_GRADUADO,
+                    'codigo' => \Illuminate\Support\Str::uuid(),
+                    'invitados_autorizados' => $ceremoniaCreada->invitados_por_defecto ?? 2,
+                    'generado_en' => now(), // <-- Añadimos esto para satisfacer la base de datos
+                ]);
+
+                // Boleto de Invitados
+                BoletoGraduacion::create([
+                    'fk_id_ceremonia' => $ceremoniaCreada->id,
+                    'no_de_control' => $alumno->no_de_control,
+                    'tipo' => BoletoGraduacion::TIPO_INVITADO,
+                    'codigo' => \Illuminate\Support\Str::uuid(),
+                    'invitados_autorizados' => $ceremoniaCreada->invitados_por_defecto ?? 2,
+                    'generado_en' => now(), // <-- Y aquí también
+                ]);
+            }
+
+            return $ceremoniaCreada;
         });
 
-        $this->sincronizarCarreras($ceremonia, $carreras);
-
-        return back();
+        return back()->with('success', 'Ceremonia, periodo, carreras y boletos generados automáticamente.');
     }
 
     /** Botón "Editar": guarda los cambios de una ceremonia existente. */

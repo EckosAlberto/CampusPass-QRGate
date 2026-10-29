@@ -41,9 +41,9 @@ class ConfiguracionController extends Controller
         $this->verificarPermiso($request);
 
         $datos = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'apellido_paterno' => ['required', 'string', 'max:100'],
-            'apellido_materno' => ['required', 'string', 'max:100'],
+            'name' => ['required', 'string', 'max:255', 'regex:/^[\pL\s]+$/u'],
+            'apellido_paterno' => ['required', 'string', 'max:100', 'regex:/^[\pL\s]+$/u'],
+            'apellido_materno' => ['required', 'string', 'max:100', 'regex:/^[\pL\s]+$/u'],
             'email' => ['required', 'email', 'max:255', 'unique:usuarios_eventos,email'],
             'rol' => ['required', Rule::in(RolesInstitucionales::nombres())],
             'password' => $this->passwordRules(),
@@ -51,7 +51,7 @@ class ConfiguracionController extends Controller
         ]);
 
         $datos = $this->normalizarDatosPersonales($datos);
-        $rol = RolEventos::porNombre($datos['rol']);
+        $rol = RolEventos::porNombre($datos['rol']); 
 
         EventosUsuario::create([
             'name' => trim("{$datos['name']} {$datos['apellido_paterno']} {$datos['apellido_materno']}"),
@@ -79,29 +79,31 @@ class ConfiguracionController extends Controller
         $this->verificarPermiso($request);
 
         $datos = $request->validate([
-            'name' => ['sometimes', 'string', 'max:255'],
-            'apellido_paterno' => ['sometimes', 'string', 'max:100'],
-            'apellido_materno' => ['sometimes', 'string', 'max:100'],
+            'name' => ['sometimes', 'string', 'max:255', 'regex:/^[\pL\s]+$/u'],
+            'apellido_paterno' => ['sometimes', 'string', 'max:100', 'regex:/^[\pL\s]+$/u'],
+            'apellido_materno' => ['sometimes', 'string', 'max:100', 'regex:/^[\pL\s]+$/u'],
             'email' => ['sometimes', 'email', 'max:255', Rule::unique('usuarios_eventos', 'email')->ignore($usuario->id)],
             'rol' => ['sometimes', Rule::in(RolesInstitucionales::nombres())],
             'activo' => ['sometimes', 'boolean'],
             ...$this->datosPersonalesRules(requerido: false),
         ]);
 
+        // Evita que un usuario se desactive a sí mismo.
         if (array_key_exists('activo', $datos) && ! $datos['activo'] && $usuario->id === $request->user('eventos')->id) {
             throw ValidationException::withMessages([
                 'activo' => 'No puedes desactivar tu propia cuenta.',
             ]);
         }
 
-        $datos = $this->normalizarDatosPersonales($datos);
+        $datos = $this->normalizarDatosPersonales($datos); // Normaliza fecha de nacimiento, CURP, RFC y teléfono.
 
+        // Si se especifica un rol, lo convierte en el ID correspondiente y elimina la clave 'rol' del arreglo.
         if (array_key_exists('rol', $datos)) {
             $datos['rol_id'] = RolEventos::porNombre($datos['rol'])->id;
             unset($datos['rol']);
         }
 
-        
+        // Si se especifica alguno de los campos de nombre o apellidos, reconstruye el campo 'name' completo.
         if (array_key_exists('name', $datos) || array_key_exists('apellido_paterno', $datos) || array_key_exists('apellido_materno', $datos)) {
             $nombrePila = $datos['name'] ?? $this->nombrePila($usuario);
             $apellidoPaterno = $datos['apellido_paterno'] ?? $usuario->apellido_paterno;
@@ -109,7 +111,7 @@ class ConfiguracionController extends Controller
             $datos['name'] = trim("{$nombrePila} {$apellidoPaterno} {$apellidoMaterno}");
         }
 
-        $usuario->update($datos);
+        $usuario->update($datos); // Actualiza los datos del usuario en la base de datos.
 
         return back()->with('success', 'Usuario actualizado.');
     }
@@ -131,7 +133,7 @@ class ConfiguracionController extends Controller
     /** Guarda la tabla de permisos por rol. */
     public function actualizarPermisos(Request $request): RedirectResponse
     {
-        $this->verificarPermiso($request);
+        $this->verificarPermiso($request); // Verifica que el usuario tenga permiso para configurar el sistema.
 
         $datos = $request->validate([
             'matriz' => ['required', 'array'],
@@ -170,7 +172,7 @@ class ConfiguracionController extends Controller
     /**
      * @return array<string, mixed>
      */
-    private function serializarUsuario(EventosUsuario $usuario): array
+    private function serializarUsuario(EventosUsuario $usuario): array // Convierte un modelo de usuario en un arreglo para enviarlo a la vista.
     {
         return [
             'id' => $usuario->id,

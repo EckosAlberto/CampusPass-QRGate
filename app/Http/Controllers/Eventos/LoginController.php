@@ -36,7 +36,7 @@ class LoginController extends Controller
             ]);
         }
 
-        
+        // Se verifica si el usuario está activo antes de permitir el inicio de sesión.
         if (! $user->activo) {
             throw ValidationException::withMessages([
                 'email' => trans('auth.failed'),

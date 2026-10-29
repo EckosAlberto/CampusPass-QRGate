@@ -28,7 +28,6 @@ class TwoFactorChallengeController extends Controller
         return Inertia::render('graduacion/two-factor-challenge');
     }
 
-    
     public function store(Request $request, TwoFactorAuthenticationProvider $provider): RedirectResponse
     {
         $validated = $request->validate([

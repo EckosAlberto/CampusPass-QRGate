@@ -13,14 +13,12 @@ use Inertia\Response;
 
 class DashboardController extends Controller
 {
-    /**
-     * Horario de operación considerado para la gráfica de entradas por hora.
-     */
+    /** Horario de operación considerado para la gráfica de entradas por hora. */
     private const HORA_APERTURA = 7;
 
     private const HORA_CIERRE = 21;
 
-    private const ACCESOS_RECIENTES_LIMITE = 8;
+    private const ACCESOS_RECIENTES_LIMITE = 6;
 
     private const DIAS_HISTORICO = 7;
 
@@ -128,7 +126,7 @@ class DashboardController extends Controller
                 'nombre' => $registro->alumno?->nombreCompleto()
                     ?? $registro->personal?->nombreCompleto()
                     ?? 'Desconocido',
-                'carrera' => $registro->alumno?->nombreCarrera(),
+                'carrera' => $registro->alumno?->carrera, // Puede ser null si es personal o desconocido
                 'tipoMovimiento' => $registro->tipo_movimiento,
             ])
             ->all();

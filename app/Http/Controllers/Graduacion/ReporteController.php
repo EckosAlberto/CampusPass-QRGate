@@ -290,6 +290,7 @@ class ReporteController extends Controller
         return $dompdf->output();
     }
 
+    /** Exportar a Excel a partir de los datios ya guardados */
     private function generarExcel(ReporteGraduacion $reporte): Xlsx
     {
         $datos = $reporte->datos;

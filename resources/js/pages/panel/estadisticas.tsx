@@ -336,7 +336,7 @@ export default function Estadisticas({
                         <div className="flex flex-col gap-3">
                             {datos.accesosPorCarrera.length === 0 ? (
                                 <p className="py-6 text-center text-sm text-muted-foreground">
-                                    Sin datos en el periodo seleccionado.
+                                    Sin datos en el periodo seleccionado...
                                 </p>
                             ) : (
                                 datos.accesosPorCarrera.map((item) => (

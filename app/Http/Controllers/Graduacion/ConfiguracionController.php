@@ -41,9 +41,9 @@ class ConfiguracionController extends Controller
         $this->verificarPermiso($request);
 
         $datos = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'apellido_paterno' => ['required', 'string', 'max:100'],
-            'apellido_materno' => ['required', 'string', 'max:100'],
+            'name' => ['required', 'string', 'max:255', 'regex:/^[\pL\s]+$/u'],
+            'apellido_paterno' => ['required', 'string', 'max:100', 'regex:/^[\pL\s]+$/u'],
+            'apellido_materno' => ['required', 'string', 'max:100', 'regex:/^[\pL\s]+$/u'],
             'email' => ['required', 'email', 'max:255', 'unique:usuarios_graduacion,email'],
             'rol' => ['required', Rule::in(RolesInstitucionales::nombres())],
             'password' => $this->passwordRules(),
@@ -70,15 +70,15 @@ class ConfiguracionController extends Controller
         return back()->with('success', 'Usuario creado.');
     }
 
-    
+    // ** Actializar usuarios. */
     public function updateUsuario(Request $request, GraduacionUsuario $usuario): RedirectResponse
     {
         $this->verificarPermiso($request);
 
         $datos = $request->validate([
-            'name' => ['sometimes', 'string', 'max:255'],
-            'apellido_paterno' => ['sometimes', 'string', 'max:100'],
-            'apellido_materno' => ['sometimes', 'string', 'max:100'],
+            'name' => ['sometimes', 'string', 'max:255', 'regex:/^[\pL\s]+$/u'],
+            'apellido_paterno' => ['sometimes', 'string', 'max:100', 'regex:/^[\pL\s]+$/u'],
+            'apellido_materno' => ['sometimes', 'string', 'max:100', 'regex:/^[\pL\s]+$/u'],
             'email' => ['sometimes', 'email', 'max:255', Rule::unique('usuarios_graduacion', 'email')->ignore($usuario->id)],
             'rol' => ['sometimes', Rule::in(RolesInstitucionales::nombres())],
             'activo' => ['sometimes', 'boolean'],
@@ -167,6 +167,7 @@ class ConfiguracionController extends Controller
         return back()->with('success', 'Permisos actualizados.');
     }
 
+    /** Verificar permiso */
     private function verificarPermiso(Request $request): void
     {
         abort_unless($request->user('graduacion')->tienePermiso('configurar-sistema'), 403);

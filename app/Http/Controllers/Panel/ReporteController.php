@@ -274,7 +274,6 @@ class ReporteController extends Controller
             'creadoPor' => $reporte->fk_generado_por,
         ];
     }
-
     
     public function generarPdf(ReporteBiblioteca $reporte): string
     {
@@ -335,7 +334,6 @@ class ReporteController extends Controller
         return new Xlsx($spreadsheet);
     }
 
-    
     private function nombreArchivo(ReporteBiblioteca $reporte, string $extension): string
     {
         $nombre = str_replace(['/', '\\'], '-', $reporte->nombre);

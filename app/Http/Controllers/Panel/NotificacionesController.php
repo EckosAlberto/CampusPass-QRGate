@@ -45,7 +45,6 @@ class NotificacionesController extends Controller
         ]);
     }
 
-    
     public function marcarVistas(Request $request): JsonResponse
     {
         

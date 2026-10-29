@@ -36,7 +36,6 @@ class LoginController extends Controller
             ]);
         }
 
-        
         if (! $user->activo) {
             throw ValidationException::withMessages([
                 'email' => trans('auth.failed'),

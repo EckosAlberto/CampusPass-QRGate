@@ -149,8 +149,7 @@ class ReporteController extends Controller
     }
 
     /**
-     * El nombre del reporte incluye fechas con "/" (p. ej. "08/09/2026"), que
-     * rompen la cabecera Content-Disposition — se sanean para el archivo.
+     * El nombre del reporte incluye fechas con "/" (p. ej. "08/09/2026").
      */
     private function nombreArchivo(Reporte $reporte, string $extension): string
     {

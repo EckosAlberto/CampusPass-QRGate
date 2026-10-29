@@ -31,10 +31,7 @@ class BibliotecaController extends Controller
         ]);
     }
 
-    /**
-     * Procesa el escaneo de un código QR y registra la entrada o salida del
-     * usuario en la biblioteca.
-     */
+    /** Procesa el escaneo de un código QR y registra la entrada o salida del usuario en la biblioteca. */
     public function store(Request $request): RedirectResponse 
     {
         $validated = $request->validate([

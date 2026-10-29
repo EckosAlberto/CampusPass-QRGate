@@ -18,13 +18,13 @@ class EstadisticasController extends Controller
 {
     use OpcionesCarreras;
 
-    private const HORA_APERTURA = 7;
+    private const HORA_APERTURA = 7; // Hora de apertura de la biblioteca (7 AM)
 
-    private const HORA_CIERRE = 20;
+    private const HORA_CIERRE = 20; // Hora de cierre de la biblioteca (8 PM)
 
-    private const MAX_SEMESTRE = 9;
+    private const MAX_SEMESTRE = 9; // Semestre máximo permitido (9° semestre)
 
-    private const DIAS_POR_DEFECTO = 14;
+    private const DIAS_POR_DEFECTO = 1; // Días por defecto para el rango de fechas
 
     /** Pantalla de Estadísticas: gráficas de accesos (por hora, sexo, carrera, semestre, día). */
     public function index(Request $request): Response
@@ -118,7 +118,7 @@ class EstadisticasController extends Controller
      * @param  Collection<int, RegistroAcceso>  $registros
      * @return list<array{sexo: string, total: int}>
      */
-    private function distribucionPorSexo(Collection $registros): array
+    private function distribucionPorSexo(Collection $registros): array 
     {
         $etiquetas = ['H' => 'Hombres', 'M' => 'Mujeres'];
 
