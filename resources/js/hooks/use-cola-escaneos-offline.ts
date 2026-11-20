@@ -1,0 +1,142 @@
+import { router } from '@inertiajs/react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { toast } from 'sonner';
+import {
+    agregarEscaneoPendiente,
+    contarEscaneosPendientes,
+    eliminarEscaneoPendiente,
+    listarEscaneosPendientes,
+} from '@/lib/cola-escaneos-offline';
+
+type Opciones = {
+    urlActual: string;
+    componenteRegistro: string;
+};
+
+export function useColaEscaneosOffline({
+    urlActual,
+    componenteRegistro,
+}: Opciones) {
+    const [enLinea, setEnLinea] = useState(
+        () => typeof navigator === 'undefined' || navigator.onLine,
+    );
+    const [pendientes, setPendientes] = useState(0);
+    const sincronizandoRef = useRef(false);
+
+    const actualizarConteo = useCallback(() => {
+        contarEscaneosPendientes(urlActual)
+            .then(setPendientes)
+            .catch(() => {});
+    }, [urlActual]);
+
+    useEffect(() => {
+        actualizarConteo();
+    }, [actualizarConteo]);
+
+    const sincronizar = useCallback(async () => {
+        if (sincronizandoRef.current || !navigator.onLine) {
+            return;
+        }
+
+        sincronizandoRef.current = true;
+
+        try {
+            const cola = await listarEscaneosPendientes(urlActual);
+            let sincronizados = 0;
+            let enlaceExpirado = false;
+
+            for (const item of cola) {
+                if (!navigator.onLine) {
+                    break;
+                }
+
+                const resultado = await new Promise<
+                    'procesado' | 'expirado' | 'fallo'
+                >((resolve) => {
+                    router.post(
+                        urlActual,
+                        { codigo: item.codigo, capturado_en: item.capturadoEn },
+                        {
+                            preserveScroll: true,
+                            preserveState: true,
+                            onSuccess: (page) =>
+                                resolve(
+                                    page.component === componenteRegistro
+                                        ? 'procesado'
+                                        : 'expirado',
+                                ),
+                            onError: () => resolve('fallo'),
+                        },
+                    );
+                });
+
+                if (resultado === 'procesado') {
+                    await eliminarEscaneoPendiente(item.id);
+                    sincronizados++;
+
+                    continue;
+                }
+
+                if (resultado === 'expirado') {
+                    enlaceExpirado = true;
+                }
+
+                break;
+            }
+
+            if (sincronizados > 0) {
+                toast.success(
+                    `Se sincronizaron ${sincronizados} escaneo${sincronizados === 1 ? '' : 's'} pendiente${sincronizados === 1 ? '' : 's'}.`,
+                );
+            }
+
+            if (enlaceExpirado) {
+                toast.error(
+                    'El enlace de esta sesión ya expiró: los escaneos restantes no se pudieron sincronizar.',
+                );
+            }
+
+            actualizarConteo();
+        } finally {
+            sincronizandoRef.current = false;
+        }
+    }, [urlActual, componenteRegistro, actualizarConteo]);
+
+    useEffect(() => {
+        function alConectar() {
+            setEnLinea(true);
+            sincronizar();
+        }
+
+        function alDesconectar() {
+            setEnLinea(false);
+        }
+
+        window.addEventListener('online', alConectar);
+        window.addEventListener('offline', alDesconectar);
+
+        if (navigator.onLine) {
+            sincronizar();
+        }
+
+        return () => {
+            window.removeEventListener('online', alConectar);
+            window.removeEventListener('offline', alDesconectar);
+        };
+    }, [sincronizar]);
+
+    const guardarPendiente = useCallback(
+        async (codigo: string) => {
+            await agregarEscaneoPendiente({
+                id: crypto.randomUUID(),
+                url: urlActual,
+                codigo,
+                capturadoEn: new Date().toISOString(),
+            });
+            actualizarConteo();
+        },
+        [urlActual, actualizarConteo],
+    );
+
+    return { enLinea, pendientes, guardarPendiente };
+}
