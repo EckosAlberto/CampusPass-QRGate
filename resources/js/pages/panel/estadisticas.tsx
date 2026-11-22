@@ -1,6 +1,7 @@
 import { Head, router } from '@inertiajs/react';
-import { Eraser, LogIn, LogOut, UserCheck } from 'lucide-react';
+import { Eraser, LogIn, LogOut, UserCheck, CalendarDays } from 'lucide-react';
 import type { ReactNode } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { AccesosPorDiaChart } from '@/components/dashboard/accesos-por-dia-chart';
 import { DistribucionPorSexoChart } from '@/components/dashboard/distribucion-por-sexo-chart';
 import { EntradasPorHoraChart } from '@/components/dashboard/entradas-por-hora-chart';
@@ -19,6 +20,106 @@ import { dashboard, estadisticas } from '@/routes';
 import type { EstadisticasBibliotecaProps, EstadisticasFiltros } from '@/types';
 
 const FILTRO_TODOS = 'todos';
+
+function mostrarFecha(fecha: string): string {
+    if (!fecha) return '';
+    const [anio, mes, dia] = fecha.split('-');
+    return `${dia}/${mes}/${anio}`;
+}
+
+function leerFecha(texto: string): string | null {
+    const coincidencia = texto.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+    if (!coincidencia) return null;
+
+    const [, dia, mes, anio] = coincidencia;
+    const fecha = new Date(Date.UTC(Number(anio), Number(mes) - 1, Number(dia)));
+
+    if (
+        fecha.getUTCFullYear() !== Number(anio) ||
+        fecha.getUTCMonth() !== Number(mes) - 1 ||
+        fecha.getUTCDate() !== Number(dia)
+    ) {
+        return null;
+    }
+
+    return `${anio}-${mes}-${dia}`;
+}
+
+function CampoFechaEstadistica({
+    etiqueta,
+    valor,
+    minimo,
+    maximo,
+    onChange,
+}: {
+    etiqueta: string;
+    valor: string;
+    minimo?: string;
+    maximo: string;
+    onChange: (valor: string) => void;
+}) {
+    const [texto, setTexto] = useState(mostrarFecha(valor));
+    const selectorFecha = useRef<HTMLInputElement>(null);
+
+    useEffect(() => {
+        setTexto(mostrarFecha(valor));
+    }, [valor]);
+
+    function actualizarTexto(nuevoTexto: string) {
+        setTexto(nuevoTexto);
+
+        if (nuevoTexto === '') {
+            onChange('');
+            return;
+        }
+
+        const fecha = leerFecha(nuevoTexto);
+
+        if (fecha && fecha <= maximo && (!minimo || fecha >= minimo)) {
+            onChange(fecha);
+        }
+    }
+
+    return (
+        <div className="relative">
+            <Input
+                type="text"
+                inputMode="numeric"
+                autoComplete="off"
+                maxLength={10}
+                placeholder="dd/mm/aaaa"
+                aria-label={etiqueta}
+                value={texto}
+                className="pr-10"
+                onChange={(evento) => actualizarTexto(evento.target.value)}
+                onBlur={() => {
+                    const fecha = leerFecha(texto);
+                    if (
+                        texto !== '' &&
+                        (!fecha || fecha > maximo || (minimo && fecha < minimo))
+                    ) {
+                        setTexto(mostrarFecha(valor));
+                    }
+                }}
+            />
+            <CalendarDays className="pointer-events-none absolute top-1/2 right-3 size-4 -translate-y-1/2 text-muted-foreground" />
+            <input
+                ref={selectorFecha}
+                type="date"
+                tabIndex={-1}
+                aria-label={`Elegir ${etiqueta.toLowerCase()}`}
+                className="absolute top-0 right-0 size-9 cursor-pointer opacity-0"
+                value={valor}
+                min={minimo}
+                max={maximo}
+                onChange={(evento) => {
+                    setTexto(mostrarFecha(evento.target.value));
+                    onChange(evento.target.value);
+                }}
+            />
+        </div>
+    );
+}
 
 function CampoFiltro({
     etiqueta,
@@ -108,10 +209,26 @@ export default function Estadisticas({
 }: EstadisticasBibliotecaProps) {
     function navegar(cambios: Partial<EstadisticasFiltros>) {
         const siguiente: EstadisticasFiltros = { ...filtros, ...cambios };
-        if (cambios.fechaInicial && siguiente.fechaFinal && siguiente.fechaFinal < siguiente.fechaInicial) {
+        if (
+            cambios.fechaInicial &&
+            siguiente.fechaFinal &&
+            siguiente.fechaFinal < siguiente.fechaInicial
+        ) {
             siguiente.fechaFinal = siguiente.fechaInicial;
         }
-        if (cambios.fechaFinal && siguiente.fechaInicial && siguiente.fechaInicial > siguiente.fechaFinal) {
+        if (
+            cambios.fechaFinal &&
+            siguiente.fechaInicial &&
+            siguiente.fechaInicial > siguiente.fechaFinal
+        ) {
+            siguiente.fechaInicial = siguiente.fechaFinal;
+        }
+        if (
+            cambios.fechaFinal &&
+            siguiente.fechaFinal &&
+            !siguiente.fechaInicial &&
+            siguiente.fechaFinal < fechaMaxima
+        ) {
             siguiente.fechaInicial = siguiente.fechaFinal;
         }
         const query: Record<string, string> = {};
@@ -175,27 +292,23 @@ export default function Estadisticas({
 
                     <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
                         <CampoFiltro etiqueta="Fecha inicial">
-                            <Input
-                                type="date"
-                                max={fechaMaxima}
-                                value={filtros.fechaInicial}
-                                onChange={(evento) =>
-                                    navegar({
-                                        fechaInicial: evento.target.value,
-                                    })
+                            <CampoFechaEstadistica
+                                etiqueta="Fecha inicial"
+                                valor={filtros.fechaInicial}
+                                maximo={fechaMaxima}
+                                onChange={(fechaInicial) =>
+                                    navegar({ fechaInicial })
                                 }
                             />
                         </CampoFiltro>
                         <CampoFiltro etiqueta="Fecha final">
-                            <Input
-                                type="date"
-                                min={filtros.fechaInicial}
-                                max={fechaMaxima}
-                                value={filtros.fechaFinal}
-                                onChange={(evento) =>
-                                    navegar({
-                                        fechaFinal: evento.target.value,
-                                    })
+                            <CampoFechaEstadistica
+                                etiqueta="Fecha final"
+                                valor={filtros.fechaFinal}
+                                minimo={filtros.fechaInicial || undefined}
+                                maximo={fechaMaxima}
+                                onChange={(fechaFinal) =>
+                                    navegar({ fechaFinal })
                                 }
                             />
                         </CampoFiltro>

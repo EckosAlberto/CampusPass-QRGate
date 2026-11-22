@@ -60,8 +60,8 @@ class EstadisticasController extends Controller
         return Inertia::render('panel/estadisticas', [
             'fechaMaxima' => today()->toDateString(),
             'filtros' => [
-                'fechaInicial' => $fechaInicial,
-                'fechaFinal' => $fechaFinal,
+                'fechaInicial' => $filtros['fecha_inicial'] ?? '',
+                'fechaFinal' => $filtros['fecha_final'] ?? '',
                 'carrera' => $filtros['carrera'] ?? '',
                 'semestre' => isset($filtros['semestre']) ? (string) $filtros['semestre'] : '',
             ],
