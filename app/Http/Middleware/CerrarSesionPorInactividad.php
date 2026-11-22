@@ -31,10 +31,6 @@ class CerrarSesionPorInactividad
         $minutosInactividad = min(120, max(1, (int) ($ajustes?->sesion_inactividad_minutos ?? 30)));
         $ultimaActividad = $request->session()->get('campuspass.ultima_actividad');
 
-        if ($cerrarPorInactividad && $guard->viaRemember() && ! $ultimaActividad) {
-            return $this->cerrarSesion($request, $guardName);
-        }
-
         if (
             $cerrarPorInactividad
             && $ultimaActividad

@@ -8,4 +8,4 @@ RUN composer install --no-dev --optimize-autoloader --no-interaction --no-script
 RUN sed -i 's!/var/www/html!/var/www/html/public!g' /etc/apache2/sites-available/000-default.conf
 RUN chown -R www-data:www-data storage bootstrap/cache
 EXPOSE 80
-CMD bash -c "a2dismod mpm_event mpm_worker || true; a2enmod mpm_prefork rewrite || true; php artisan config:clear; php artisan migrate --force || true; apache2-foreground"
+CMD bash -c "a2dismod mpm_event mpm_worker || true; a2enmod mpm_prefork rewrite || true; set -e; php artisan config:clear; php artisan migrate --force; apache2-foreground"
