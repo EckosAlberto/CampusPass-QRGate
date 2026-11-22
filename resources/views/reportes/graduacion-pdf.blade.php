@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <style>
         body { font-family: sans-serif; font-size: 12px; color: #111; }
+        .logo { display: block; width: 220px; height: auto; margin: 0 auto 18px; }
         h1 { font-size: 18px; margin-bottom: 0; }
         p.subtitulo { color: #555; margin-top: 4px; }
         table { width: 100%; border-collapse: collapse; margin-top: 12px; }
@@ -15,6 +16,7 @@
     </style>
 </head>
 <body>
+    <img class="logo" src="{{ $logo }}" alt="Tecnológico Nacional de México - Instituto Tecnológico de Tepic">
     <h1>{{ $reporte['nombre'] }}</h1>
     <p class="subtitulo">Periodo: {{ $reporte['periodo'] }} &middot; Generado por: {{ $reporte['generadoPor'] }} &middot; {{ $reporte['fechaGeneracion'] }}</p>
 

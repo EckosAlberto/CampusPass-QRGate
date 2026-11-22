@@ -277,6 +277,7 @@ class ReporteController extends Controller
         $dompdf->loadHtml(view('reportes.pdf', [
             'reporte' => $this->serializar($reporte),
             'datos' => $reporte->datos,
+            'logo' => 'data:image/png;base64,'.base64_encode(file_get_contents(public_path('images/logo-itt.png'))),
         ])->render());
         $dompdf->setPaper('letter', 'portrait');
         $dompdf->render();
