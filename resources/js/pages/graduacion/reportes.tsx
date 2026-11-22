@@ -73,6 +73,7 @@ function construirPaginas(
 }
 
 export default function ReportesGraduacion({
+    fechaMaxima,
     usuarioId,
     reportes,
     catalogos,
@@ -81,7 +82,24 @@ export default function ReportesGraduacion({
     const [generando, setGenerando] = useState(false);
 
     function actualizar<K extends keyof FiltrosForm>(campo: K, valor: string) {
-        setFiltros((actual) => ({ ...actual, [campo]: valor }));
+        setFiltros((actual) => {
+            const siguiente = { ...actual, [campo]: valor };
+            if (
+                campo === 'fecha_inicial' &&
+                siguiente.fecha_final &&
+                siguiente.fecha_final < valor
+            ) {
+                siguiente.fecha_final = valor;
+            }
+            if (
+                campo === 'fecha_final' &&
+                siguiente.fecha_inicial &&
+                valor < siguiente.fecha_inicial
+            ) {
+                siguiente.fecha_inicial = valor;
+            }
+            return siguiente;
+        });
     }
 
     function limpiarFiltros() {
@@ -194,6 +212,7 @@ export default function ReportesGraduacion({
                                 </Label>
                                 <Input
                                     type="date"
+                                    max={fechaMaxima}
                                     value={filtros.fecha_inicial}
                                     onChange={(evt) =>
                                         actualizar(
@@ -201,7 +220,7 @@ export default function ReportesGraduacion({
                                             evt.target.value,
                                         )
                                     }
-                                    className="w-40"
+                                    className="w-full sm:w-40"
                                 />
                             </div>
 
@@ -211,6 +230,8 @@ export default function ReportesGraduacion({
                                 </Label>
                                 <Input
                                     type="date"
+                                    min={filtros.fecha_inicial || undefined}
+                                    max={fechaMaxima}
                                     value={filtros.fecha_final}
                                     onChange={(evt) =>
                                         actualizar(
@@ -218,7 +239,7 @@ export default function ReportesGraduacion({
                                             evt.target.value,
                                         )
                                     }
-                                    className="w-40"
+                                    className="w-full sm:w-40"
                                 />
                             </div>
 

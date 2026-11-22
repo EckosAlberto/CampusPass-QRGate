@@ -168,7 +168,7 @@ function EventoFormDialog({
                                 )}
                             </div>
 
-                            <div className="grid grid-cols-2 gap-4">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div className="grid gap-1.5">
                                     <Label htmlFor="fecha">Fecha inicio</Label>
                                     <Input
@@ -197,6 +197,7 @@ function EventoFormDialog({
                                         id="fecha_fin"
                                         name="fecha_fin"
                                         type="date"
+                                        min={valores.fecha || undefined}
                                         value={valores.fecha_fin}
                                         onChange={(evt) =>
                                             actualizar(
@@ -368,7 +369,7 @@ function DetalleEventoDialog({
                             <DialogTitle>{evento.nombre}</DialogTitle>
                         </DialogHeader>
 
-                        <dl className="grid grid-cols-2 gap-x-4 gap-y-3 text-sm">
+                        <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-3 text-sm">
                             <div>
                                 <dt className="text-muted-foreground">
                                     Fecha inicio

@@ -611,6 +611,7 @@ function PestanaGeneral({ ajustes }: { ajustes: AjustesBiblioteca }) {
                     <Input
                         type="number"
                         min={1}
+                        max={120}
                         className="w-20"
                         value={sesion.sesionInactividadMinutos}
                         onChange={(evento) =>
@@ -834,7 +835,7 @@ function NuevoUsuarioDialog({
                             </p>
                         )}
                     </div>
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div className="grid gap-1.5">
                             <Label htmlFor="nuevo-usuario-apellido-paterno">
                                 Apellido paterno
@@ -886,7 +887,7 @@ function NuevoUsuarioDialog({
                             </p>
                         )}
                     </div>
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div className="grid gap-1.5">
                             <Label htmlFor="nuevo-usuario-nacimiento">
                                 Fecha de nacimiento
@@ -923,7 +924,7 @@ function NuevoUsuarioDialog({
                             )}
                         </div>
                     </div>
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div className="grid gap-1.5">
                             <Label htmlFor="nuevo-usuario-curp">CURP</Label>
                             <Input
@@ -959,7 +960,7 @@ function NuevoUsuarioDialog({
                             )}
                         </div>
                     </div>
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div className="grid gap-1.5">
                             <Label htmlFor="nuevo-usuario-password">
                                 Contraseña
@@ -1149,7 +1150,7 @@ function EditarUsuarioFormulario({
                         </p>
                     )}
                 </div>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="grid gap-1.5">
                         <Label htmlFor="editar-usuario-apellido-paterno">
                             Apellido paterno
@@ -1197,7 +1198,7 @@ function EditarUsuarioFormulario({
                         </p>
                     )}
                 </div>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="grid gap-1.5">
                         <Label htmlFor="editar-usuario-nacimiento">
                             Fecha de nacimiento
@@ -1232,7 +1233,7 @@ function EditarUsuarioFormulario({
                         )}
                     </div>
                 </div>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="grid gap-1.5">
                         <Label htmlFor="editar-usuario-curp">CURP</Label>
                         <Input
@@ -2193,7 +2194,7 @@ function PestanaSistema({ ajustes }: { ajustes: AjustesBiblioteca }) {
     ];
 
     return (
-        <div className="grid gap-4 lg:grid-cols-2">
+        <div className="grid gap-4 grid-cols-1 lg:grid-cols-2">
             <Fieldset>
                 <FieldsetLegend>Preferencias regionales</FieldsetLegend>
                 <p className="mb-2 text-sm text-muted-foreground">

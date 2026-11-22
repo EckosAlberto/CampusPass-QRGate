@@ -101,12 +101,19 @@ function BarraHorizontal({
 }
 
 export default function Estadisticas({
+    fechaMaxima,
     filtros,
     opciones,
     datos,
 }: EstadisticasBibliotecaProps) {
     function navegar(cambios: Partial<EstadisticasFiltros>) {
         const siguiente: EstadisticasFiltros = { ...filtros, ...cambios };
+        if (cambios.fechaInicial && siguiente.fechaFinal && siguiente.fechaFinal < siguiente.fechaInicial) {
+            siguiente.fechaFinal = siguiente.fechaInicial;
+        }
+        if (cambios.fechaFinal && siguiente.fechaInicial && siguiente.fechaInicial > siguiente.fechaFinal) {
+            siguiente.fechaInicial = siguiente.fechaFinal;
+        }
         const query: Record<string, string> = {};
 
         if (siguiente.fechaInicial) {
@@ -166,10 +173,11 @@ export default function Estadisticas({
                 <Fieldset>
                     <FieldsetLegend>Búsqueda por</FieldsetLegend>
 
-                    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                    <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
                         <CampoFiltro etiqueta="Fecha inicial">
                             <Input
                                 type="date"
+                                max={fechaMaxima}
                                 value={filtros.fechaInicial}
                                 onChange={(evento) =>
                                     navegar({
@@ -181,6 +189,8 @@ export default function Estadisticas({
                         <CampoFiltro etiqueta="Fecha final">
                             <Input
                                 type="date"
+                                min={filtros.fechaInicial}
+                                max={fechaMaxima}
                                 value={filtros.fechaFinal}
                                 onChange={(evento) =>
                                     navegar({
@@ -330,7 +340,7 @@ export default function Estadisticas({
                     <AccesosPorDiaChart data={datos.accesosPorDia} />
                 </Fieldset>
 
-                <div className="grid gap-4 lg:grid-cols-2">
+                <div className="grid gap-4 grid-cols-1 lg:grid-cols-2">
                     <Fieldset>
                         <FieldsetLegend>Accesos por carrera</FieldsetLegend>
                         <div className="flex flex-col gap-3">

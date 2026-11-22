@@ -36,6 +36,7 @@ export type EstadisticasOpcion = {
 };
 
 export type EstadisticasBibliotecaProps = {
+    fechaMaxima: string;
     filtros: EstadisticasFiltros;
     opciones: {
         carreras: EstadisticasOpcion[];

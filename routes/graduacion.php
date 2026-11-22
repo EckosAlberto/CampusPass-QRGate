@@ -11,6 +11,7 @@ use App\Http\Controllers\Graduacion\NotificacionesController;
 use App\Http\Controllers\Graduacion\PanelController;
 use App\Http\Controllers\Graduacion\PasswordConfirmationController;
 use App\Http\Controllers\Graduacion\ReporteController;
+use App\Http\Middleware\CerrarSesionPorInactividad;
 use App\Http\Controllers\Graduacion\SeguridadController;
 use App\Http\Controllers\Graduacion\TwoFactorChallengeController;
 use App\Http\Middleware\PreventBackHistoryCache;
@@ -36,7 +37,7 @@ Route::middleware('guest:graduacion')->group(function () {
         ->name('graduacion.two-factor.login.store');
 });
 
-Route::middleware(['auth:graduacion', PreventBackHistoryCache::class, EncryptHistoryMiddleware::class])->group(function () {
+Route::middleware([CerrarSesionPorInactividad::class, 'auth:graduacion', PreventBackHistoryCache::class, EncryptHistoryMiddleware::class])->group(function () {
     Route::post('graduacion/logout', [LoginController::class, 'destroy'])->name('graduacion.logout');
 
     Route::get('graduacion/cuenta/confirmar-password', [PasswordConfirmationController::class, 'show'])->name('graduacion.password.confirm');

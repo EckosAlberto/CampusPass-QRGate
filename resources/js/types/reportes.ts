@@ -17,6 +17,7 @@ export type ReporteBibliotecaFila = {
 };
 
 export type ReportesBibliotecaProps = {
+    fechaMaxima: string;
     usuarioId: number;
     reportes: {
         data: ReporteBibliotecaFila[];

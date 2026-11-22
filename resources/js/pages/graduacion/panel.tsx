@@ -26,7 +26,7 @@ export default function GraduacionPanel({
                     <p className="text-sm text-muted-foreground">Graduación</p>
                 </div>
 
-                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
                     <Card className="border-l-4 border-l-blue-500 py-4 lg:col-span-1 dark:border-l-blue-400">
                         <CardContent className="flex flex-col gap-1">
                             <span className="text-xs font-medium tracking-wide text-muted-foreground uppercase">

@@ -9,6 +9,7 @@ use App\Http\Controllers\Eventos\NotificacionesController;
 use App\Http\Controllers\Eventos\PanelController;
 use App\Http\Controllers\Eventos\PasswordConfirmationController;
 use App\Http\Controllers\Eventos\ReporteController;
+use App\Http\Middleware\CerrarSesionPorInactividad;
 use App\Http\Controllers\Eventos\SeguridadController;
 use App\Http\Controllers\Eventos\TwoFactorChallengeController;
 use App\Http\Middleware\PreventBackHistoryCache;
@@ -34,7 +35,7 @@ Route::middleware('guest:eventos')->group(function () {
         ->name('eventos.two-factor.login.store');
 });
 
-Route::middleware(['auth:eventos', PreventBackHistoryCache::class, EncryptHistoryMiddleware::class])->group(function () {
+Route::middleware([CerrarSesionPorInactividad::class, 'auth:eventos', PreventBackHistoryCache::class, EncryptHistoryMiddleware::class])->group(function () {
     Route::post('eventos-academicos/logout', [LoginController::class, 'destroy'])->name('eventos.logout');
 
     Route::get('eventos-academicos/cuenta/confirmar-password', [PasswordConfirmationController::class, 'show'])->name('eventos.password.confirm');

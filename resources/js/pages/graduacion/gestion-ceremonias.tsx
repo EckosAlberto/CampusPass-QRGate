@@ -47,6 +47,14 @@ const VALORES_VACIOS: CeremoniaFormValues = {
     carreras: [],
 };
 
+function fechaMinimaFin(fechaInicio: string): string | undefined {
+    if (!fechaInicio) return undefined;
+    const fecha = new Date(fechaInicio);
+    fecha.setHours(fecha.getHours() + 1);
+    const dos = (valor: number) => String(valor).padStart(2, '0');
+    return `${fecha.getFullYear()}-${dos(fecha.getMonth() + 1)}-${dos(fecha.getDate())}T${dos(fecha.getHours())}:${dos(fecha.getMinutes())}`;
+}
+
 function valoresDesdeCeremonia(ceremonia: CeremoniaFila): CeremoniaFormValues {
     return {
         nombre: ceremonia.nombre,
@@ -159,7 +167,7 @@ function CeremoniaFormDialog({
                                 )}
                             </div>
 
-                            <div className="grid grid-cols-2 gap-4">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div className="grid gap-1.5">
                                     <Label htmlFor="fecha_inicio">
                                         Fecha y hora inicio
@@ -192,6 +200,7 @@ function CeremoniaFormDialog({
                                         id="fecha_fin"
                                         name="fecha_fin"
                                         type="datetime-local"
+                                        min={fechaMinimaFin(valores.fecha_inicio)}
                                         value={valores.fecha_fin}
                                         onChange={(evt) =>
                                             actualizar(
@@ -261,7 +270,7 @@ function CeremoniaFormDialog({
                                         value={c.reticula}
                                     />
                                 ))}
-                                <div className="grid max-h-40 grid-cols-2 gap-2 overflow-y-auto rounded-md border border-input p-3">
+                                <div className="grid max-h-40 grid-cols-1 sm:grid-cols-2 gap-2 overflow-y-auto rounded-md border border-input p-3">
                                     {catalogos.carreras.map((carrera) => {
                                         const [cve, ret] =
                                             carrera.value.split('-');
@@ -292,7 +301,7 @@ function CeremoniaFormDialog({
                                 </div>
                             </div>
 
-                            <div className="grid grid-cols-2 gap-4">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div className="grid gap-1.5">
                                     <Label htmlFor="minutos_anticipados_graduados">
                                         Min. anticipación egresados
@@ -439,7 +448,7 @@ function DetalleCeremoniaDialog({
                             <DialogTitle>{ceremonia.nombre}</DialogTitle>
                         </DialogHeader>
 
-                        <dl className="grid grid-cols-2 gap-x-4 gap-y-3 text-sm">
+                        <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-3 text-sm">
                             <div>
                                 <dt className="text-muted-foreground">
                                     Fecha y hora inicio

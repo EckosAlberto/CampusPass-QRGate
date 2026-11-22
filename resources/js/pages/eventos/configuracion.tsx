@@ -161,7 +161,7 @@ function NuevoUsuarioDialog({
                             </p>
                         )}
                     </div>
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div className="grid gap-1.5">
                             <Label htmlFor="nuevo-usuario-apellido-paterno">
                                 Apellido paterno
@@ -213,7 +213,7 @@ function NuevoUsuarioDialog({
                             </p>
                         )}
                     </div>
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div className="grid gap-1.5">
                             <Label htmlFor="nuevo-usuario-nacimiento">
                                 Fecha de nacimiento
@@ -250,7 +250,7 @@ function NuevoUsuarioDialog({
                             )}
                         </div>
                     </div>
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div className="grid gap-1.5">
                             <Label htmlFor="nuevo-usuario-curp">CURP</Label>
                             <Input
@@ -286,7 +286,7 @@ function NuevoUsuarioDialog({
                             )}
                         </div>
                     </div>
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div className="grid gap-1.5">
                             <Label htmlFor="nuevo-usuario-password">
                                 Contraseña
@@ -476,7 +476,7 @@ function EditarUsuarioFormulario({
                         </p>
                     )}
                 </div>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="grid gap-1.5">
                         <Label htmlFor="editar-usuario-apellido-paterno">
                             Apellido paterno
@@ -524,7 +524,7 @@ function EditarUsuarioFormulario({
                         </p>
                     )}
                 </div>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="grid gap-1.5">
                         <Label htmlFor="editar-usuario-nacimiento">
                             Fecha de nacimiento
@@ -559,7 +559,7 @@ function EditarUsuarioFormulario({
                         )}
                     </div>
                 </div>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="grid gap-1.5">
                         <Label htmlFor="editar-usuario-curp">CURP</Label>
                         <Input

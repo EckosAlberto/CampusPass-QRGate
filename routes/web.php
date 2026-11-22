@@ -8,6 +8,7 @@ use App\Http\Controllers\Panel\NotificacionesController;
 use App\Http\Controllers\Panel\PersonasDentroController;
 use App\Http\Controllers\Panel\RegistroDelDiaController;
 use App\Http\Controllers\Panel\ReporteController;
+use App\Http\Middleware\CerrarSesionPorInactividad;
 use App\Http\Middleware\PreventBackHistoryCache;
 use Illuminate\Support\Facades\Route;
 use Inertia\EncryptHistoryMiddleware;
@@ -16,7 +17,7 @@ use Inertia\EncryptHistoryMiddleware;
 Route::inertia('/', 'portal')->name('home');
 
 // Rutas protegidas
-Route::middleware(['auth', 'verified', PreventBackHistoryCache::class, EncryptHistoryMiddleware::class])->group(function () {
+Route::middleware([CerrarSesionPorInactividad::class, 'auth', 'verified', PreventBackHistoryCache::class, EncryptHistoryMiddleware::class])->group(function () {
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     Route::get('registro-del-dia', [RegistroDelDiaController::class, 'index'])->name('registro-del-dia');

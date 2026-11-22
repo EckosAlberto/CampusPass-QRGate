@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Alumno;
+use App\Models\ConfiguracionBiblioteca;
 use App\Models\Personal;
 use App\Models\RegistroAcceso;
 use App\Models\Ubicacion;
@@ -33,8 +34,19 @@ class DashboardController extends Controller
             ->orderBy('fecha_hora')
             ->get(['no_de_control', 'rfc_personal', 'tipo_movimiento', 'fecha_hora']);
 
+        $resumen = $this->resumenDelDia($registrosHoy);
+        $capacidad = max(0, (int) (ConfiguracionBiblioteca::query()->value('capacidad_maxima') ?? 0));
+        $ocupacion = $resumen['personasDentro'];
+        $porcentajeOcupacion = $capacidad > 0 ? (int) round(($ocupacion / $capacidad) * 100) : null;
+
         return Inertia::render('dashboard', [
-            'resumen' => $this->resumenDelDia($registrosHoy),
+            'resumen' => $resumen,
+            'aforo' => [
+                'actual' => $ocupacion,
+                'capacidad' => $capacidad,
+                'porcentaje' => $porcentajeOcupacion,
+                'estado' => $capacidad === 0 ? 'sin_limite' : ($ocupacion >= $capacidad ? 'lleno' : ($ocupacion >= $capacidad * 0.8 ? 'cerca' : 'disponible')),
+            ],
             'entradasPorHora' => $this->entradasPorHora($registrosHoy),
             'distribucionPorSexo' => $this->distribucionPorSexo($registrosHoy),
             'accesosRecientes' => $this->accesosRecientes($bibliotecaId),

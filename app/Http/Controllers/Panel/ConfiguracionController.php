@@ -93,7 +93,7 @@ class ConfiguracionController extends Controller
             'notif_reportes' => ['sometimes', 'boolean'],
             'notif_resumen_diario' => ['sometimes', 'boolean'],
             'notif_correo' => ['sometimes', 'boolean'],
-            'sesion_inactividad_minutos' => ['sometimes', 'integer', 'min:1'],
+            'sesion_inactividad_minutos' => ['sometimes', 'integer', 'min:1', 'max:120'],
             'sesion_cerrar_auto' => ['sometimes', 'boolean'],
             'sesion_mantener_activa' => ['sometimes', 'boolean'],
             'zona_horaria' => ['sometimes', 'string', 'max:60'],

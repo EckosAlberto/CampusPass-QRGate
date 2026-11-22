@@ -11,6 +11,7 @@ use App\Models\Ubicacion;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -29,14 +30,20 @@ class EstadisticasController extends Controller
     public function index(Request $request): Response
     {
         $filtros = $request->validate([
-            'fecha_inicial' => ['nullable', 'date'],
-            'fecha_final' => ['nullable', 'date'],
+            'fecha_inicial' => ['nullable', 'date_format:Y-m-d', 'before_or_equal:today'],
+            'fecha_final' => ['nullable', 'date_format:Y-m-d', 'before_or_equal:today'],
             'carrera' => ['nullable', 'string', 'max:3'],
             'semestre' => ['nullable', 'integer', 'min:1', 'max:'.self::MAX_SEMESTRE],
         ]);
 
         $fechaFinal = $filtros['fecha_final'] ?? today()->toDateString();
         $fechaInicial = $filtros['fecha_inicial'] ?? today()->subDays(self::DIAS_POR_DEFECTO - 1)->toDateString();
+
+        if ($fechaFinal < $fechaInicial) {
+            throw ValidationException::withMessages([
+                'fecha_final' => 'La fecha final debe ser igual o posterior a la fecha inicial.',
+            ]);
+        }
 
         $bibliotecaId = Ubicacion::where('nombre', 'Biblioteca')->value('id');
 
@@ -49,6 +56,7 @@ class EstadisticasController extends Controller
             ->get();
 
         return Inertia::render('panel/estadisticas', [
+            'fechaMaxima' => today()->toDateString(),
             'filtros' => [
                 'fechaInicial' => $fechaInicial,
                 'fechaFinal' => $fechaFinal,

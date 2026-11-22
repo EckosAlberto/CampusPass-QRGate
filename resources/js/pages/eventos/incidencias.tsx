@@ -116,7 +116,7 @@ function DetalleIncidenciaDialog({
                             </DialogTitle>
                         </DialogHeader>
 
-                        <dl className="grid grid-cols-2 gap-x-4 gap-y-3 text-sm">
+                        <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-3 text-sm">
                             <div>
                                 <dt className="text-muted-foreground">
                                     Fecha y hora

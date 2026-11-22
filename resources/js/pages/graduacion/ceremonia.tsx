@@ -264,7 +264,7 @@ export default function Ceremonia({
                     </Card>
                 </div>
 
-                <div className="grid gap-4 lg:grid-cols-2">
+                <div className="grid gap-4 grid-cols-1 lg:grid-cols-2">
                     <Fieldset className="flex min-w-0 flex-col gap-4">
                         <FieldsetLegend>
                             Registrar Acceso a la ceremonia

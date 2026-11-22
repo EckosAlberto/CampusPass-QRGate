@@ -325,7 +325,7 @@ export default function MisEventos({ eventos }: MisEventosProps) {
                         Todavía no has creado ningún evento.
                     </p>
                 ) : (
-                    <div className="grid gap-4 lg:grid-cols-2">
+                    <div className="grid gap-4 grid-cols-1 lg:grid-cols-2">
                         {eventos.data.map((evento) => (
                             <EventoCard key={evento.id} evento={evento} />
                         ))}

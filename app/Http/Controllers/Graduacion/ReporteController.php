@@ -43,6 +43,7 @@ class ReporteController extends Controller
             ->withQueryString();
 
         return Inertia::render('graduacion/reportes', [
+            'fechaMaxima' => today()->toDateString(),
             'usuarioId' => $request->user('graduacion')->id,
             'reportes' => [
                 'data' => collect($reportes->items())->map(fn (ReporteGraduacion $reporte) => $this->serializar($reporte))->all(),
@@ -68,8 +69,8 @@ class ReporteController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $filtros = $request->validate([
-            'fecha_inicial' => ['required', 'date'],
-            'fecha_final' => ['required', 'date', 'after_or_equal:fecha_inicial'],
+            'fecha_inicial' => ['required', 'date_format:Y-m-d', 'before_or_equal:today'],
+            'fecha_final' => ['required', 'date_format:Y-m-d', 'after_or_equal:fecha_inicial', 'before_or_equal:today'],
             'fk_id_ceremonia' => ['nullable', 'uuid', 'exists:ceremonias_graduacion,id'],
             'carrera' => ['nullable', 'string', 'max:3'],
             'tipo' => ['required', 'in:resumen_general,detallado'],

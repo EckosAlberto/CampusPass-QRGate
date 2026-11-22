@@ -45,6 +45,7 @@ class ReporteController extends Controller
             ->withQueryString();
 
         return Inertia::render('panel/reportes', [
+            'fechaMaxima' => today()->toDateString(),
             'usuarioId' => $request->user()->id,
             'reportes' => [
                 'data' => collect($reportes->items())->map(fn (ReporteBiblioteca $reporte) => $this->serializar($reporte))->all(),
@@ -79,8 +80,8 @@ class ReporteController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $filtros = $request->validate([
-            'fecha_inicial' => ['required', 'date'],
-            'fecha_final' => ['required', 'date', 'after_or_equal:fecha_inicial'],
+            'fecha_inicial' => ['required', 'date_format:Y-m-d', 'before_or_equal:today'],
+            'fecha_final' => ['required', 'date_format:Y-m-d', 'after_or_equal:fecha_inicial', 'before_or_equal:today'],
             'carrera' => ['nullable', 'string', 'max:3'],
             'semestre' => ['nullable', 'integer', 'min:1', 'max:12'],
             'sexo' => ['nullable', 'in:H,M'],

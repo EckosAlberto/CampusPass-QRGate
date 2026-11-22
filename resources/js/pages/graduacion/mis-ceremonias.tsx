@@ -288,7 +288,7 @@ export default function MisCeremonias({ ceremonias }: MisCeremoniasProps) {
                         Todavía no has creado ninguna ceremonia.
                     </p>
                 ) : (
-                    <div className="grid gap-4 lg:grid-cols-2">
+                    <div className="grid gap-4 grid-cols-1 lg:grid-cols-2">
                         {ceremonias.map((ceremonia) => (
                             <CeremoniaCard
                                 key={ceremonia.id}

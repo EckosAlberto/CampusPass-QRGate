@@ -30,6 +30,12 @@ export type AccesosPorDia = {
 
 export type DashboardProps = {
     resumen: ResumenDelDia;
+    aforo: {
+        actual: number;
+        capacidad: number;
+        porcentaje: number | null;
+        estado: 'sin_limite' | 'lleno' | 'cerca' | 'disponible';
+    };
     entradasPorHora: EntradasPorHora[];
     distribucionPorSexo: DistribucionPorSexo[];
     accesosRecientes: AccesoReciente[];

@@ -15,7 +15,20 @@ export default function Dashboard({
     distribucionPorSexo,
     accesosRecientes,
     accesosPorDia,
+    aforo,
 }: DashboardProps) {
+    const colorAforo = {
+        sin_limite: 'bg-muted-foreground',
+        lleno: 'bg-red-600',
+        cerca: 'bg-amber-500',
+        disponible: 'bg-emerald-600',
+    }[aforo.estado];
+    const textoAforo = {
+        sin_limite: 'Sin capacidad configurada',
+        lleno: 'Capacidad alcanzada',
+        cerca: 'Cerca de la capacidad',
+        disponible: 'Capacidad disponible',
+    }[aforo.estado];
     const tarjetas = [
         {
             label: 'Entradas hoy',
@@ -53,7 +66,7 @@ export default function Dashboard({
 
                 <Fieldset>
                     <FieldsetLegend>Resumen general del día</FieldsetLegend>
-                    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                    <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
                         {tarjetas.map((tarjeta) => (
                             <div
                                 key={tarjeta.label}
@@ -70,6 +83,33 @@ export default function Dashboard({
                                 </span>
                             </div>
                         ))}
+                    </div>
+                </Fieldset>
+
+                <Fieldset>
+                    <FieldsetLegend>Ocupación de biblioteca</FieldsetLegend>
+                    <div className="flex flex-col gap-3 rounded-lg border border-border p-4 sm:flex-row sm:items-center">
+                        <span className={`size-3 shrink-0 rounded-full ${colorAforo}`} aria-hidden="true" />
+                        <div className="min-w-0 flex-1">
+                            <p className="font-medium">{textoAforo}</p>
+                            <p className="text-sm text-muted-foreground">
+                                {aforo.capacidad > 0
+                                    ? `${aforo.actual} de ${aforo.capacidad} personas · ${aforo.porcentaje}%`
+                                    : `${aforo.actual} personas dentro`}
+                            </p>
+                        </div>
+                        {aforo.capacidad > 0 && (
+                            <div
+                                className="h-2 w-full overflow-hidden rounded-full bg-muted sm:w-48"
+                                role="progressbar"
+                                aria-label="Ocupación de biblioteca"
+                                aria-valuemin={0}
+                                aria-valuemax={aforo.capacidad}
+                                aria-valuenow={Math.min(aforo.actual, aforo.capacidad)}
+                            >
+                                <div className={`h-full ${colorAforo}`} style={{ width: `${Math.min(100, aforo.porcentaje ?? 0)}%` }} />
+                            </div>
+                        )}
                     </div>
                 </Fieldset>
 

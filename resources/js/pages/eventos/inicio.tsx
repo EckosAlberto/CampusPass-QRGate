@@ -86,7 +86,7 @@ function DetalleAsistenciaDialog({
                             <DialogTitle>{registro.nombre}</DialogTitle>
                         </DialogHeader>
 
-                        <dl className="grid grid-cols-2 gap-x-4 gap-y-3 text-sm">
+                        <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-3 text-sm">
                             <div>
                                 <dt className="text-muted-foreground">
                                     Fecha y hora
@@ -160,7 +160,7 @@ export default function EventosInicio({ resumen, asistencia }: InicioProps) {
                     </p>
                 </div>
 
-                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+                <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-5">
                     <Card className="border-l-4 border-l-blue-500 py-4 lg:col-span-1 dark:border-l-blue-400">
                         <CardContent className="flex flex-col gap-1">
                             <span className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
