@@ -119,7 +119,7 @@ class ConfiguracionController extends Controller
             'apellido_paterno' => ['required', 'string', 'max:100', 'regex:/^[\pL\s]+$/u'],
             'apellido_materno' => ['required', 'string', 'max:100', 'regex:/^[\pL\s]+$/u'],
             'email' => ['required', 'email', 'max:255', 'unique:users,email'],
-            'tipo' => ['required', Rule::in(RolesInstitucionales::nombres())],
+            'tipo' => ['required', Rule::in(RolesInstitucionales::nombres()), Rule::exists('tipos_usuario', 'descripcion_tipo')],
             'password' => $this->passwordRules(),
             ...$this->datosPersonalesRules(),
         ]);
@@ -154,7 +154,7 @@ class ConfiguracionController extends Controller
             'apellido_paterno' => ['sometimes', 'string', 'max:100', 'regex:/^[\pL\s]+$/u'],
             'apellido_materno' => ['sometimes', 'string', 'max:100', 'regex:/^[\pL\s]+$/u'],
             'email' => ['sometimes', 'email', 'max:255', Rule::unique('users', 'email')->ignore($usuario->id)],
-            'tipo' => ['sometimes', Rule::in(RolesInstitucionales::nombres())],
+            'tipo' => ['sometimes', Rule::in(RolesInstitucionales::nombres()), Rule::exists('tipos_usuario', 'descripcion_tipo')],
             'activo' => ['sometimes', 'boolean'],
             ...$this->datosPersonalesRules(requerido: false),
         ]);
@@ -168,7 +168,15 @@ class ConfiguracionController extends Controller
         $datos = $this->normalizarDatosPersonales($datos);
 
         if (array_key_exists('tipo', $datos)) {
-            $datos['tipo'] = TipoUsuario::porNombre($datos['tipo'])->tipo_usuario;
+            $rol = TipoUsuario::porNombre($datos['tipo']);
+
+            if ($usuario->is($request->user()) && $rol?->tipo_usuario !== TipoUsuario::ADMINISTRADOR) {
+                throw ValidationException::withMessages([
+                    'tipo' => 'No puedes quitarte el rol de administrador de tu propia cuenta.',
+                ]);
+            }
+
+            $datos['tipo'] = $rol->tipo_usuario;
         }
 
         

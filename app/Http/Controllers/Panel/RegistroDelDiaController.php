@@ -33,11 +33,13 @@ class RegistroDelDiaController extends Controller
 
         $bibliotecaId = Ubicacion::where('nombre', 'Biblioteca')->value('id');
 
-        $registrosHoy = RegistroAcceso::where('id_ubicacion', $bibliotecaId)
-            ->whereDate('fecha_hora', today())
-            ->with(['alumno', 'personal'])
-            ->orderBy('fecha_hora')
-            ->get();
+        $registrosHoy = $bibliotecaId === null
+            ? collect()
+            : RegistroAcceso::where('id_ubicacion', $bibliotecaId)
+                ->whereDate('fecha_hora', today())
+                ->with(['alumno', 'personal'])
+                ->orderBy('fecha_hora')
+                ->get();
 
         $filas = $this->conTiempoDePermanencia($registrosHoy)
             ->filter(fn (array $fila) => $this->coincideConFiltros($fila, $filtros))

@@ -47,13 +47,15 @@ class EstadisticasController extends Controller
 
         $bibliotecaId = Ubicacion::where('nombre', 'Biblioteca')->value('id');
 
-        $registros = RegistroAcceso::query()
-            ->where('id_ubicacion', $bibliotecaId)
-            ->whereBetween('fecha_hora', ["{$fechaInicial} 00:00:00", "{$fechaFinal} 23:59:59"])
-            ->when($filtros['carrera'] ?? null, fn ($query, $carrera) => $query->whereHas('alumno', fn ($q) => $q->where('carrera', $carrera)))
-            ->when($filtros['semestre'] ?? null, fn ($query, $semestre) => $query->whereHas('alumno', fn ($q) => $q->where('semestre', $semestre)))
-            ->with(['alumno', 'personal'])
-            ->get();
+        $registros = $bibliotecaId === null
+            ? collect()
+            : RegistroAcceso::query()
+                ->where('id_ubicacion', $bibliotecaId)
+                ->whereBetween('fecha_hora', ["{$fechaInicial} 00:00:00", "{$fechaFinal} 23:59:59"])
+                ->when($filtros['carrera'] ?? null, fn ($query, $carrera) => $query->whereHas('alumno', fn ($q) => $q->where('carrera', $carrera)))
+                ->when($filtros['semestre'] ?? null, fn ($query, $semestre) => $query->whereHas('alumno', fn ($q) => $q->where('semestre', $semestre)))
+                ->with(['alumno', 'personal'])
+                ->get();
 
         return Inertia::render('panel/estadisticas', [
             'fechaMaxima' => today()->toDateString(),

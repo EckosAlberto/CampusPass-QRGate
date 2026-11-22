@@ -29,10 +29,12 @@ class DashboardController extends Controller
         $ubicacion = Ubicacion::where('nombre', 'Biblioteca')->first();
         $bibliotecaId = $ubicacion?->id;
 
-        $registrosHoy = RegistroAcceso::where('id_ubicacion', $bibliotecaId)
-            ->whereDate('fecha_hora', today())
-            ->orderBy('fecha_hora')
-            ->get(['no_de_control', 'rfc_personal', 'tipo_movimiento', 'fecha_hora']);
+        $registrosHoy = $bibliotecaId === null
+            ? collect()
+            : RegistroAcceso::where('id_ubicacion', $bibliotecaId)
+                ->whereDate('fecha_hora', today())
+                ->orderBy('fecha_hora')
+                ->get(['no_de_control', 'rfc_personal', 'tipo_movimiento', 'fecha_hora']);
 
         $resumen = $this->resumenDelDia($registrosHoy);
         $capacidad = max(0, (int) (ConfiguracionBiblioteca::query()->value('capacidad_maxima') ?? 0));

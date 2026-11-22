@@ -15,6 +15,9 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
+        if (app()->environment('production')) {
+            throw new \LogicException('DatabaseSeeder contiene usuarios y registros de demostración; no debe ejecutarse en producción.');
+        }
 
         $this->call([
             TipoUsuarioSeeder::class,

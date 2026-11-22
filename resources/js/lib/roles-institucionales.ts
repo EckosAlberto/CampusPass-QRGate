@@ -6,6 +6,4 @@ export const ROLES_INSTITUCIONALES = [
     'Servicios Escolares',
     'Personal de Servicio',
     'Invitado',
-    'Tutor',
-    
 ] as const;

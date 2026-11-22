@@ -993,24 +993,22 @@ function NuevoUsuarioDialog({
                     </div>
                     <div className="grid gap-1.5">
                         <Label htmlFor="nuevo-usuario-rol">Rol</Label>
-                        <Select value={rol} onValueChange={setRol}>
-                            <SelectTrigger
-                                id="nuevo-usuario-rol"
-                                className="w-full"
-                            >
-                                <SelectValue placeholder="Selecciona un rol" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                {ROLES_INSTITUCIONALES.map((nombreRol) => (
-                                    <SelectItem
-                                        key={nombreRol}
-                                        value={nombreRol}
-                                    >
-                                        {nombreRol}
-                                    </SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
+                        <select
+                            id="nuevo-usuario-rol"
+                            value={rol}
+                            onChange={(evento) => setRol(evento.target.value)}
+                            aria-invalid={Boolean(errores.tipo)}
+                            className="border-input bg-background focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:border-destructive h-9 w-full rounded-md border px-3 py-2 text-sm shadow-xs outline-none focus-visible:ring-[3px]"
+                        >
+                            <option value="" disabled>
+                                Selecciona un rol
+                            </option>
+                            {ROLES_INSTITUCIONALES.map((nombreRol) => (
+                                <option key={nombreRol} value={nombreRol}>
+                                    {nombreRol}
+                                </option>
+                            ))}
+                        </select>
                         {errores.tipo && (
                             <p className="text-sm text-destructive">
                                 {errores.tipo}
@@ -1271,21 +1269,22 @@ function EditarUsuarioFormulario({
                 </div>
                 <div className="grid gap-1.5">
                     <Label htmlFor="editar-usuario-rol">Rol</Label>
-                    <Select value={rol} onValueChange={setRol}>
-                        <SelectTrigger
-                            id="editar-usuario-rol"
-                            className="w-full"
-                        >
-                            <SelectValue placeholder="Selecciona un rol" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {ROLES_INSTITUCIONALES.map((nombreRol) => (
-                                <SelectItem key={nombreRol} value={nombreRol}>
-                                    {nombreRol}
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
+                    <select
+                        id="editar-usuario-rol"
+                        value={rol}
+                        onChange={(evento) => setRol(evento.target.value)}
+                        aria-invalid={Boolean(errores.tipo)}
+                        className="border-input bg-background focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:border-destructive h-9 w-full rounded-md border px-3 py-2 text-sm shadow-xs outline-none focus-visible:ring-[3px]"
+                    >
+                        <option value="" disabled>
+                            Selecciona un rol
+                        </option>
+                        {ROLES_INSTITUCIONALES.map((nombreRol) => (
+                            <option key={nombreRol} value={nombreRol}>
+                                {nombreRol}
+                            </option>
+                        ))}
+                    </select>
                     {errores.tipo && (
                         <p className="text-sm text-destructive">
                             {errores.tipo}

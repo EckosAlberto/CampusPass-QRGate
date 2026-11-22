@@ -10,6 +10,10 @@ class RegistroAccesoSeeder extends Seeder
 {
     public function run(): void
     {
+        if (app()->environment('production')) {
+            throw new \LogicException('RegistroAccesoSeeder contiene asistencias de demostración y no debe ejecutarse en producción.');
+        }
+
         $evento = EventoTutorias::query()->where('nombre', 'Sesión grupal de seguimiento')->firstOrFail();
 
         $movimientos = [

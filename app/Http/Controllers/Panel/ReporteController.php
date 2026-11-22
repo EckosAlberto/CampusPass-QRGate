@@ -178,20 +178,21 @@ class ReporteController extends Controller
     {
         $bibliotecaId = Ubicacion::where('nombre', 'Biblioteca')->value('id');
 
-        $registros = RegistroAcceso::query()
-            ->where('id_ubicacion', $bibliotecaId)
-            ->whereBetween(DB::raw('DATE(fecha_hora)'), [$filtros['fecha_inicial'], $filtros['fecha_final']])
-            ->when($filtros['tipo_movimiento'] ?? null, fn ($query, $movimiento) => $query->where('tipo_movimiento', $movimiento))
-            ->when($filtros['carrera'] ?? null, fn ($query, $carrera) => $query->whereHas('alumno', fn ($q) => $q->where('carrera', $carrera)))
-            ->when($filtros['semestre'] ?? null, fn ($query, $semestre) => $query->whereHas('alumno', fn ($q) => $q->where('semestre', $semestre)))
-            ->when($filtros['sexo'] ?? null, fn ($query, $sexo) => $query->where(fn ($q) => $q
-                ->whereHas('alumno', fn ($q2) => $q2->where('sexo', $sexo))
-                
-                ->orWhereHas('personal', fn ($q2) => $q2->whereRaw('SUBSTR(curp_empleado, 11, 1) = ?', [$sexo]))
-            ))
-            ->with(['alumno', 'personal'])
-            ->orderBy('fecha_hora')
-            ->get();
+        $registros = $bibliotecaId === null
+            ? collect()
+            : RegistroAcceso::query()
+                ->where('id_ubicacion', $bibliotecaId)
+                ->whereBetween(DB::raw('DATE(fecha_hora)'), [$filtros['fecha_inicial'], $filtros['fecha_final']])
+                ->when($filtros['tipo_movimiento'] ?? null, fn ($query, $movimiento) => $query->where('tipo_movimiento', $movimiento))
+                ->when($filtros['carrera'] ?? null, fn ($query, $carrera) => $query->whereHas('alumno', fn ($q) => $q->where('carrera', $carrera)))
+                ->when($filtros['semestre'] ?? null, fn ($query, $semestre) => $query->whereHas('alumno', fn ($q) => $q->where('semestre', $semestre)))
+                ->when($filtros['sexo'] ?? null, fn ($query, $sexo) => $query->where(fn ($q) => $q
+                    ->whereHas('alumno', fn ($q2) => $q2->where('sexo', $sexo))
+                    ->orWhereHas('personal', fn ($q2) => $q2->whereRaw('SUBSTR(curp_empleado, 11, 1) = ?', [$sexo]))
+                ))
+                ->with(['alumno', 'personal'])
+                ->orderBy('fecha_hora')
+                ->get();
 
         return [
             [
